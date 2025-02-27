@@ -1,4 +1,3 @@
-import sys
 import pygame
 import random
 
@@ -61,4 +60,71 @@ class Game:
                 break
 
         self.holes = list()
-        dig_holes(self.empty_cells, self.holes)
+        self.dig_holes()
+
+        self.player = Player(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED)
+        for i in range(self.maze.width):
+            for j in range(self.maze.height):
+                if self.maze.maze[i][j] == ' ':
+                    self.player.x = j * CELL_WIDTH
+                    self.player.y = i * CELL_HEIGHT
+                    break
+            else:
+                continue
+            break
+
+        self.camera = Camera(self.player.x, self.player.y, 0, 0)
+
+        self.all_objects = list(self.walls)
+        self.all_objects.extend(self.keys)
+        self.all_objects.extend(self.holes)
+        self.all_objects.append(self.gates)
+        self.all_objects.append(self.player)
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            self.screen.fill(BLACK)
+
+            objects_to_delete = list()
+            for game_object in self.all_objects:
+                game_object.update(self.screen, self.camera, self.all_objects)
+                if type(game_object) == Key and game_object.collected:
+                    self.player.keys_collected += 1
+                    objects_to_delete.append(game_object)
+                    self.keys.remove(game_object)
+                    continue
+                if type(game_object) == Hole and game_object.used:
+                    objects_to_delete.append(game_object)
+                    self.holes.remove(game_object)
+                    if len(self.holes) != 0:
+                        hole = self.holes.pop(0)
+                        objects_to_delete.append(hole)
+                        self.player.x = hole.x
+                        self.player.y = hole.y
+                    else:
+                        print('OUT OF HOLES')
+
+                    continue
+
+            for game_object in objects_to_delete:
+                self.all_objects.remove(game_object)
+
+            self.camera.update(self.screen, self.player)
+
+            # print(player.x, player.y)
+
+            pygame.display.flip()
+
+            if len(self.holes) < HOLES_NUMBER:
+                self.dig_holes()
+                for hole in self.holes:
+                    if not hole in self.all_objects:
+                        self.all_objects.append(hole)
+
+            pygame.time.Clock().tick(100)
+
+        pygame.quit()
