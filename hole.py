@@ -1,8 +1,8 @@
 import pygame
 
-from GameObject import GameObject
-from HyperParameters import BROWN
-from Player import Player
+from game_object import GameObject
+from hyper_parameters import BROWN
+from player import Player
 
 
 class Hole(GameObject):
@@ -18,9 +18,6 @@ class Hole(GameObject):
             self.used = True
             print('TRAVELING INTO THE DARK')
         return True
-
-    def update(self, screen, camera, items):
-        self.draw(screen, camera)
 
     def draw(self, screen, camera):
         pygame.draw.rect(screen, BROWN, pygame.Rect(camera.apply(self)))

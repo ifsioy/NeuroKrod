@@ -1,9 +1,9 @@
 
 import pygame
 import math
-from HyperParameters import W_SHIFT, H_SHIFT, BASE_SIZE, KEYS_NUMBER
-from GameObject import GameObject
-from SeeingObject import SeeingObject
+from hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE, KEYS_NUMBER
+from game_object import GameObject
+from seeing_object import SeeingObject
 
 
 class Player(SeeingObject):
@@ -42,12 +42,12 @@ class Player(SeeingObject):
         for item in items:
             item.collision_check(self)
 
-    def update(self, screen, camera, items):
-        super(Player, self).update(screen, camera, items)
-        self.draw(screen, camera)
+    def update(self, items):
+        super(Player, self).update(items)
         self.move(items)
 
     def draw(self, screen, camera):
+        super(Player, self).draw(screen, camera)
         pygame.draw.rect(screen, pygame.Color('red'),
                          pygame.Rect(camera.apply(self)))
 

@@ -1,6 +1,6 @@
 import pygame
 
-from HyperParameters import WHITE
+from hyper_parameters import WHITE
 
 class GameObject:
     def __init__(self, x, y, width, height):
@@ -37,8 +37,8 @@ class GameObject:
                 another.y += to_u
         return True
 
-    def update(self, screen, camera, items):
-        self.draw(screen, camera)
+    def update(self, items):
+        pass
 
     def draw(self, screen, camera):
         pygame.draw.rect(screen, WHITE, pygame.Rect(camera.apply(self)))

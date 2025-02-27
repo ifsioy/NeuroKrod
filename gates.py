@@ -1,8 +1,8 @@
 import pygame
 
-from GameObject import GameObject
-from HyperParameters import PURPLE, KEYS_NUMBER
-from Player import Player
+from game_object import GameObject
+from hyper_parameters import PURPLE, KEYS_NUMBER
+from player import Player
 
 
 class Gates(GameObject):
@@ -17,9 +17,6 @@ class Gates(GameObject):
         if type(another) == Player and another.keys_collected == KEYS_NUMBER:
             print('AND NOW, THE END IS NEAR')
         return True
-
-    def update(self, screen, camera, items):
-        self.draw(screen, camera)
 
     def draw(self, screen, camera):
         pygame.draw.rect(screen, PURPLE, pygame.Rect(camera.apply(self)))

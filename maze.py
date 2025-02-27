@@ -1,12 +1,12 @@
 import random
 
-from HyperParameters import WALL_PERCENT
+from hyper_parameters import WALL_PERCENT
 
 
 class Maze:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, size):
+        self.width = size
+        self.height = size
         self.maze = [['#' for _ in range(self.width)] for _ in range(self.height)]
 
     def empty_neighbours(self, x, y):

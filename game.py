@@ -1,16 +1,19 @@
+from datetime import datetime
+from typing import Any
+
 import pygame
 import random
 
-from GameObject import GameObject
-from HyperParameters import *
+from game_object import GameObject
+from hyper_parameters import *
 
-from Wall import Wall
-from Maze import Maze
-from Camera import Camera
-from Player import Player
-from Key import Key
-from Gates import Gates
-from Hole import Hole
+from wall import Wall
+from maze import Maze
+from camera import Camera
+from player import Player
+from key import Key
+from gates import Gates
+from hole import Hole
 
 class Game:
     def dig_holes(self):
@@ -27,7 +30,7 @@ class Game:
                 self.holes.append(hole)
 
     def __init__(self):
-        self.maze = Maze(MAZE_SIZE, MAZE_SIZE)
+        self.maze = Maze(MAZE_SIZE)
         self.maze.generate_maze()
         for line in self.maze.maze:
             print(line)
@@ -75,23 +78,31 @@ class Game:
 
         self.camera = Camera(self.player.x, self.player.y, 0, 0)
 
-        self.all_objects = list(self.walls)
+        self.all_objects : list[Any] = self.walls
         self.all_objects.extend(self.keys)
         self.all_objects.extend(self.holes)
         self.all_objects.append(self.gates)
         self.all_objects.append(self.player)
 
+    def draw(self, objects):
+        for game_object in objects:
+            game_object.draw(self.screen, self.camera)
+
     def run(self):
         running = True
+        frames = 0
+        start = datetime.now()
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             self.screen.fill(BLACK)
 
+            self.draw(self.all_objects)
+
             objects_to_delete = list()
             for game_object in self.all_objects:
-                game_object.update(self.screen, self.camera, self.all_objects)
+                game_object.update(self.all_objects)
                 if type(game_object) == Key and game_object.collected:
                     self.player.keys_collected += 1
                     objects_to_delete.append(game_object)
@@ -110,6 +121,7 @@ class Game:
 
                     continue
 
+
             for game_object in objects_to_delete:
                 self.all_objects.remove(game_object)
 
@@ -126,5 +138,8 @@ class Game:
                         self.all_objects.append(hole)
 
             pygame.time.Clock().tick(100)
+            frames += 1
+            fps = frames / (datetime.now() - start).total_seconds()
+            print(fps)
 
         pygame.quit()

@@ -1,9 +1,9 @@
 
 import pygame
 
-from Player import Player
-from GameObject import GameObject
-from HyperParameters import YELLOW
+from player import Player
+from game_object import GameObject
+from hyper_parameters import YELLOW
 
 
 class Key(GameObject):
@@ -18,10 +18,6 @@ class Key(GameObject):
         if type(another) == Player:
             self.collected = True
         return True
-
-    def update(self, screen, camera, items):
-        self.draw(screen, camera)
-
 
     def draw(self, screen, camera):
         pygame.draw.rect(screen, YELLOW, pygame.Rect(camera.apply(self)))

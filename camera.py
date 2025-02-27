@@ -1,5 +1,5 @@
 import pygame
-from HyperParameters import H_SHIFT, W_SHIFT, BASE_SIZE
+from hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE
 
 
 class Camera:
@@ -27,7 +27,6 @@ class Camera:
 
     def update(self, screen, target):
         self.move(target)
-        self.draw(screen)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), (W_SHIFT - self.width / 2 * BASE_SIZE,

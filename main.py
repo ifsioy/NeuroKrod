@@ -1,7 +1,7 @@
 import sys
 import pygame
 
-from Game import Game
+from game import Game
 
 sys.setrecursionlimit(10**9)
 
