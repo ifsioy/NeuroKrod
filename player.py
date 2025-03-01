@@ -1,8 +1,7 @@
 
 import pygame
 import math
-from hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE, KEYS_NUMBER
-from game_object import GameObject
+from hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE
 from seeing_object import SeeingObject
 
 
@@ -43,8 +42,8 @@ class Player(SeeingObject):
             item.collision_check(self)
 
     def update(self, items):
-        super(Player, self).update(items)
         self.move(items)
+        super(Player, self).update(items)
 
     def draw(self, screen, camera):
         super(Player, self).draw(screen, camera)

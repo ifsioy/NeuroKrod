@@ -1,5 +1,4 @@
 from datetime import datetime
-from gc import is_tracked
 from typing import Any
 
 import pygame
@@ -30,10 +29,9 @@ class Game:
             if not hole in self.holes:
                 self.holes.append(hole)
 
-    def __init__(self, is_training):
+    def __init__(self):
         self.maze = Maze(MAZE_SIZE)
         self.maze.generate_maze()
-        self.is_training = is_training
         for line in self.maze.maze:
             print(line)
 
@@ -87,7 +85,7 @@ class Game:
         self.all_objects.append(self.player)
 
     def draw(self, objects):
-        if self.is_training:
+        if IS_TRAINING:
             return
         for game_object in objects:
             game_object.draw(self.screen, self.camera)
@@ -129,11 +127,11 @@ class Game:
             for game_object in objects_to_delete:
                 self.all_objects.remove(game_object)
 
-            self.camera.update(self.screen, self.player)
             self.draw(self.all_objects)
+            self.camera.update(self.screen, self.player)
 
             # print(player.x, player.y)
-            if not self.is_training:
+            if not IS_TRAINING:
                 pygame.display.flip()
 
             if len(self.holes) < HOLES_NUMBER:
@@ -148,5 +146,5 @@ class Game:
                 last_time = datetime.now()
                 frames = 0
 
-            # if not self.is_training:
+            # if not IS_TRAINING:
             #     pygame.time.Clock().tick(100)

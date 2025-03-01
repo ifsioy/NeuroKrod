@@ -6,7 +6,7 @@ from game import Game
 sys.setrecursionlimit(10**9)
 
 
-game = Game(False)
+game = Game()
 
 game.run()
 

@@ -4,7 +4,7 @@ from datetime import datetime
 import pygame
 
 from game_object import GameObject
-from hyper_parameters import RAYS_NUMBER, CELL_HEIGHT, CAST_COOLDOWN, W_SHIFT, BASE_SIZE, H_SHIFT
+from hyper_parameters import RAYS_NUMBER, CELL_HEIGHT, CAST_COOLDOWN, W_SHIFT, BASE_SIZE, H_SHIFT, CELL_WIDTH
 from ray import Ray
 
 import math
@@ -57,7 +57,7 @@ class SeeingObject(GameObject):
 
             for min_x, max_x, min_y, max_y, item_type in item_data:
                 # Early exit if closer hit impossible
-                if current_min < ((min_x - ox) ** 2 + (min_y - oy) ** 2) ** 0.5:
+                if current_min + CELL_WIDTH < ((min_x - ox) ** 2 + (min_y - oy) ** 2) ** 0.5:
                     break
 
                 t_near = -math.inf
