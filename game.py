@@ -111,8 +111,9 @@ class Game:
                     self.keys.remove(game_object)
                     continue
                 if type(game_object) == Hole and game_object.used:
+                    if not game_object in self.holes:
+                        continue
                     objects_to_delete.append(game_object)
-                    #TODO check is inside
                     self.holes.remove(game_object)
                     if len(self.holes) != 0:
                         hole = self.holes.pop(0)
