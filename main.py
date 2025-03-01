@@ -6,6 +6,8 @@ from game import Game
 sys.setrecursionlimit(10**9)
 
 
-game = Game()
+game = Game(False)
 
 game.run()
+
+pygame.quit()

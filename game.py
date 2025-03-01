@@ -1,4 +1,5 @@
 from datetime import datetime
+from gc import is_tracked
 from typing import Any
 
 import pygame
@@ -19,7 +20,7 @@ class Game:
     def dig_holes(self):
         random.shuffle(self.empty_cells)
         for i in range(len(self.empty_cells)):
-            if len(self.holes) == HOLES_NUMBER:
+            if len(self.holes) >= HOLES_NUMBER:
                 break
             cell = self.empty_cells[i]
             hole = Hole(cell.x - cell.width / 2 + CELL_WIDTH / 3 * random.randint(0, 2) + CELL_WIDTH / 6,
@@ -29,9 +30,10 @@ class Game:
             if not hole in self.holes:
                 self.holes.append(hole)
 
-    def __init__(self):
+    def __init__(self, is_training):
         self.maze = Maze(MAZE_SIZE)
         self.maze.generate_maze()
+        self.is_training = is_training
         for line in self.maze.maze:
             print(line)
 
@@ -65,7 +67,7 @@ class Game:
         self.holes = list()
         self.dig_holes()
 
-        self.player = Player(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED)
+        self.player = Player(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, CAST_COOLDOWN)
         for i in range(self.maze.width):
             for j in range(self.maze.height):
                 if self.maze.maze[i][j] == ' ':
@@ -85,20 +87,20 @@ class Game:
         self.all_objects.append(self.player)
 
     def draw(self, objects):
+        if self.is_training:
+            return
         for game_object in objects:
             game_object.draw(self.screen, self.camera)
 
     def run(self):
         running = True
         frames = 0
-        start = datetime.now()
+        last_time = datetime.now()
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             self.screen.fill(BLACK)
-
-            self.draw(self.all_objects)
 
             objects_to_delete = list()
             for game_object in self.all_objects:
@@ -110,6 +112,7 @@ class Game:
                     continue
                 if type(game_object) == Hole and game_object.used:
                     objects_to_delete.append(game_object)
+                    #TODO check is inside
                     self.holes.remove(game_object)
                     if len(self.holes) != 0:
                         hole = self.holes.pop(0)
@@ -126,10 +129,11 @@ class Game:
                 self.all_objects.remove(game_object)
 
             self.camera.update(self.screen, self.player)
+            self.draw(self.all_objects)
 
             # print(player.x, player.y)
-
-            pygame.display.flip()
+            if not self.is_training:
+                pygame.display.flip()
 
             if len(self.holes) < HOLES_NUMBER:
                 self.dig_holes()
@@ -137,9 +141,11 @@ class Game:
                     if not hole in self.all_objects:
                         self.all_objects.append(hole)
 
-            pygame.time.Clock().tick(100)
             frames += 1
-            fps = frames / (datetime.now() - start).total_seconds()
-            print(fps)
+            if (datetime.now() - last_time).total_seconds() >= 1:
+                print(frames)
+                last_time = datetime.now()
+                frames = 0
 
-        pygame.quit()
+            # if not self.is_training:
+            #     pygame.time.Clock().tick(100)

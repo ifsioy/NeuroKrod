@@ -7,8 +7,8 @@ from seeing_object import SeeingObject
 
 
 class Player(SeeingObject):
-    def __init__(self, x, y, width, height, speed):
-        super(Player, self).__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, speed, cast_cooldown = 50):
+        super(Player, self).__init__(x, y, width, height, cast_cooldown)
         self.speed = speed
         self.keys_collected = 0
 

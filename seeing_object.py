@@ -1,71 +1,109 @@
-import math
+import time
 from datetime import datetime
 
+import pygame
+
 from game_object import GameObject
-from hyper_parameters import RAYS_NUMBER, CELL_HEIGHT, CAST_COOLDOWN
+from hyper_parameters import RAYS_NUMBER, CELL_HEIGHT, CAST_COOLDOWN, W_SHIFT, BASE_SIZE, H_SHIFT
 from ray import Ray
 
-def ray_rectangle_intersection(ray, rect):
-    ox, oy = ray.x, ray.y
-    dx, dy = math.cos(ray.angle), math.sin(ray.angle)
-    t_near = -math.inf
-    t_far = math.inf
-
-    min_x = rect.x - rect.width / 2
-    min_y = rect.y - rect.height / 2
-    max_x = rect.x + rect.width / 2
-    max_y = rect.y + rect.height / 2
-
-    if dx != 0:
-        t1 = (min_x - ox) / dx
-        t2 = (max_x - ox) / dx
-        x_min, x_max = sorted((t1, t2))
-        t_near, t_far = max(x_min, t_near), min(x_max, t_far)
-    elif ox < min_x or ox > max_x:
-        return None
-
-    if dy != 0:
-        t1 = (min_y - oy) / dy
-        t2 = (max_y - oy) / dy
-        y_min, y_max = sorted((t1, t2))
-        t_near, t_far = max(y_min, t_near), min(y_max, t_far)
-    elif oy < min_y or oy > max_y:
-        return None
-
-    if t_near > t_far or t_far < 0:
-        return None
-
-    t = t_near if t_near >= 0 else t_far
-    return t if t >= 0 else None
+import math
 
 
 class SeeingObject(GameObject):
-    def __init__(self, x, y, width, height):
-        super(SeeingObject, self).__init__(x, y, width, height)
-        self.last_cast_time = datetime.now()
-        self.rays = list()
-        for i in range(RAYS_NUMBER):
-            self.rays.append(Ray(self.x, self.y, math.radians(360 / RAYS_NUMBER * i)))
+    __slots__ = ('rays', 'cast_cooldown', 'next_cast')
+
+    def __init__(self, x, y, width, height, cast_cooldown):
+        super().__init__(x, y, width, height)
+        angle_step = 2 * math.pi / RAYS_NUMBER
+        self.rays = [Ray(x, y, i * angle_step) for i in range(RAYS_NUMBER)]
+        self.cast_cooldown = cast_cooldown / 1000
+        self.next_cast = 0.0
 
     def cast_rays(self, items):
+        now = time.time()
+        if now < self.next_cast:
+            return
+        self.next_cast = now + self.cast_cooldown
+
+        # Cache origin once for all rays
+        ox, oy = self.x, self.y
+        items = [item for item in items if item is not self]
+
+        # Spatial pre-sorting by distance squared
+        items.sort(key=lambda i: (i.x - ox) ** 2 + (i.y - oy) ** 2)
+
+        # Precompute all item bounds
+        item_data = [
+            (
+                i.x - i.width / 2,  # min_x
+                i.x + i.width / 2,  # max_x
+                i.y - i.height / 2,  # min_y
+                i.y + i.height / 2,  # max_y
+                type(i)
+            ) for i in items
+        ]
+
+        # Process all rays
         for ray in self.rays:
-            ray.x = self.x
-            ray.y = self.y
             ray.length = 1e9
             ray.bumpedType = None
-            for item in items:
-                if item == self:
+            current_min = 1e9
+
+            dx_zero = ray.dx_zero
+            dy_zero = ray.dy_zero
+            inv_dx = ray.inv_dx
+            inv_dy = ray.inv_dy
+
+            for min_x, max_x, min_y, max_y, item_type in item_data:
+                # Early exit if closer hit impossible
+                if current_min < ((min_x - ox) ** 2 + (min_y - oy) ** 2) ** 0.5:
+                    break
+
+                t_near = -math.inf
+                t_far = math.inf
+
+                # X-slab
+                if not dx_zero:
+                    t1 = (min_x - ox) * inv_dx
+                    t2 = (max_x - ox) * inv_dx
+                    if t1 > t2: t1, t2 = t2, t1
+                    t_near = max(t1, t_near)
+                    t_far = min(t2, t_far)
+                    if t_near > t_far or t_near > current_min:
+                        continue
+                elif ox < min_x or ox > max_x:
                     continue
-                distance = ray_rectangle_intersection(ray, item)
-                if distance is not None and distance < ray.length:
-                    ray.length = distance
-                    ray.bumpedType = type(item)
+
+                # Y-slab
+                if not dy_zero:
+                    t1 = (min_y - oy) * inv_dy
+                    t2 = (max_y - oy) * inv_dy
+                    if t1 > t2: t1, t2 = t2, t1
+                    t_near = max(t1, t_near)
+                    t_far = min(t2, t_far)
+                    if t_near > t_far or t_near > current_min:
+                        continue
+                elif oy < min_y or oy > max_y:
+                    continue
+
+                if t_far < 0:
+                    continue
+
+                t = max(t_near, 0) if t_near >= 0 else t_far
+                if t >= 0 and t < current_min:
+                    current_min = t
+                    ray.length = t
+                    ray.bumpedType = item_type
 
     def update(self, items):
-        if (datetime.now() - self.last_cast_time).total_seconds() > CAST_COOLDOWN / 1000:
-            self.cast_rays(items)
-            self.last_cast_time = datetime.now()
+        self.cast_rays(items)
 
     def draw(self, screen, camera):
         for ray in self.rays:
-            ray.draw(screen, camera)
+            if ray.length < 1e9:
+                pygame.draw.line(screen, pygame.Color('white'),
+                                 (W_SHIFT + (self.x - camera.x) * BASE_SIZE, H_SHIFT + (self.y - camera.y) * BASE_SIZE),
+                                 (W_SHIFT + (self.x + ray.dx * ray.length - camera.x) * BASE_SIZE, H_SHIFT +
+                                 (self.y + ray.dy * ray.length - camera.y) * BASE_SIZE),
+                                 int(BASE_SIZE / 5))
