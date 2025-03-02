@@ -36,4 +36,4 @@ BROWN = (88, 57, 79)
 YELLOW = (255, 210, 0)
 PURPLE = (128, 0, 128)
 
-IS_TRAINING = True
+IS_TRAINING = False
