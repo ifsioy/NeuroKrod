@@ -1,11 +1,10 @@
 import time
-from datetime import datetime
 
 import pygame
 
-from game_object import GameObject
-from hyper_parameters import RAYS_NUMBER, CELL_HEIGHT, CAST_COOLDOWN, W_SHIFT, BASE_SIZE, H_SHIFT, CELL_WIDTH
-from ray import Ray
+from src.game_objects.game_object import GameObject
+from src.rendering.ray import Ray
+from src.utils.hyper_parameters import RAYS_NUMBER, W_SHIFT, BASE_SIZE, H_SHIFT, CELL_WIDTH
 
 import math
 
@@ -26,14 +25,11 @@ class SeeingObject(GameObject):
             return
         self.next_cast = now + self.cast_cooldown
 
-        # Cache origin once for all rays
         ox, oy = self.x, self.y
         items = [item for item in items if item is not self]
 
-        # Spatial pre-sorting by distance squared
         items.sort(key=lambda i: (i.x - ox) ** 2 + (i.y - oy) ** 2)
 
-        # Precompute all item bounds
         item_data = [
             (
                 i.x - i.width / 2,  # min_x
@@ -44,7 +40,6 @@ class SeeingObject(GameObject):
             ) for i in items
         ]
 
-        # Process all rays
         for ray in self.rays:
             ray.length = 1e9
             ray.bumpedType = None
@@ -56,14 +51,12 @@ class SeeingObject(GameObject):
             inv_dy = ray.inv_dy
 
             for min_x, max_x, min_y, max_y, item_type in item_data:
-                # Early exit if closer hit impossible
                 if current_min + CELL_WIDTH < ((min_x - ox) ** 2 + (min_y - oy) ** 2) ** 0.5:
                     break
 
                 t_near = -math.inf
                 t_far = math.inf
 
-                # X-slab
                 if not dx_zero:
                     t1 = (min_x - ox) * inv_dx
                     t2 = (max_x - ox) * inv_dx
@@ -75,7 +68,6 @@ class SeeingObject(GameObject):
                 elif ox < min_x or ox > max_x:
                     continue
 
-                # Y-slab
                 if not dy_zero:
                     t1 = (min_y - oy) * inv_dy
                     t2 = (max_y - oy) * inv_dy

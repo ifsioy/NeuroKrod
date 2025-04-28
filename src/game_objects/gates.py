@@ -1,8 +1,8 @@
 import pygame
 
-from game_object import GameObject
-from hyper_parameters import PURPLE, KEYS_NUMBER
-from player import Player
+from src.game_objects.game_object import GameObject
+from src.game_objects.player import Player
+from src.utils.hyper_parameters import PURPLE, KEYS_NUMBER
 
 
 class Gates(GameObject):

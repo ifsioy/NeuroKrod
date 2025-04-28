@@ -1,8 +1,8 @@
 
 import pygame
 import math
-from hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE
-from seeing_object import SeeingObject
+from src.utils.hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE
+from src.rendering.seeing_object import SeeingObject
 
 
 class Player(SeeingObject):
@@ -38,8 +38,8 @@ class Player(SeeingObject):
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.y -= cur_speed
 
-        for item in items:
-            item.collision_check(self)
+    def key_collected(self):
+        self.keys_collected += 1
 
     def update(self, items):
         self.move(items)

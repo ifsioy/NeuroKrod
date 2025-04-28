@@ -1,0 +1,145 @@
+from typing import List, Dict, Type, Callable
+
+from src.core.event_system import EventSystem, EventType
+from src.game_objects.enemy import Enemy
+from src.game_objects.game_object import GameObject
+from src.game_objects.gates import Gates
+from src.game_objects.hole import Hole
+from src.game_objects.key import Key
+from src.game_objects.player import Player
+from src.game_objects.wall import Wall
+from src.utils.hyper_parameters import KEYS_NUMBER
+
+
+class CollisionSystem:
+    def __init__(self):
+        self._collision_groups: Dict[Type[GameObject], List[GameObject]] = {
+            Wall: [],
+            Key: [],
+            Hole: [],
+            Player: [],
+            Enemy: [],
+            Gates: []
+        }
+
+        self._collision_handlers: Dict[tuple, Callable] = {
+            (Player, Wall): self._handle_player_wall,
+            (Player, Key): self._handle_player_key,
+            (Player, Hole): self._handle_player_hole,
+            (Player, Gates): self._handle_player_gates,
+            (Enemy, Player): self._handle_enemy_player,
+            (Enemy, Wall): self._handle_enemy_wall
+        }
+
+    def on_object_added(self, data : dict):
+        obj = data['object']
+        self.register_object(obj)
+
+    def on_object_removed(self, data : dict):
+        obj = data['object']
+        self.unregister_object(obj)
+
+    def register_object(self, obj: GameObject):
+        for obj_type in self._collision_groups:
+            if isinstance(obj, obj_type):
+                self._collision_groups[obj_type].append(obj)
+                break
+
+    def unregister_object(self, obj: GameObject):
+        for obj_type in self._collision_groups:
+            if isinstance(obj, obj_type) and obj in self._collision_groups[obj_type]:
+                self._collision_groups[obj_type].remove(obj)
+                break
+
+    @staticmethod
+    def _get_object_bounds(obj: GameObject):
+        half_w = obj.width / 2
+        half_h = obj.height / 2
+        return (
+            obj.x - half_w,
+            obj.x + half_w,
+            obj.y - half_h,
+            obj.y + half_h,
+        )
+
+    @staticmethod
+    def _aabb_collision(a: GameObject, b: GameObject):
+        a_left, a_right, a_top, a_bottom = CollisionSystem._get_object_bounds(a)
+        b_left, b_right, b_top, b_bottom = CollisionSystem._get_object_bounds(b)
+        return (a_left < b_right and
+                a_right > b_left and
+                a_top < b_bottom and
+                a_bottom > b_top)
+
+    def _resolve_collision(self, obj: GameObject, other: GameObject):
+        handler = self._collision_handlers.get((type(obj), type(other)))
+        if handler:
+            handler(obj, other)
+
+    def _check_collisions_for(self, obj: GameObject):
+        for obj_type, objects in self._collision_groups.items():
+            if obj_type == type(obj):
+                continue
+
+            for other in objects:
+                if self._aabb_collision(obj, other):
+                    self._resolve_collision(obj, other)
+
+    def check_collisions(self):
+        for player in self._collision_groups[Player]:
+            self._check_collisions_for(player)
+
+        for enemy in self._collision_groups[Enemy]:
+            self._check_collisions_for(enemy)
+
+    @staticmethod
+    def _handle_player_wall(player: Player, wall: Wall):
+        p_left, p_right, p_top, p_bottom = CollisionSystem._get_object_bounds(player)
+        w_left, w_right, w_top, w_bottom = CollisionSystem._get_object_bounds(wall)
+
+        overlap_x = min(p_right - w_left, w_right - p_left)
+        overlap_y = min(p_bottom - w_top, w_bottom - p_top)
+
+        if overlap_x < overlap_y:
+            if p_right > w_left > p_left:
+                player.x = w_left - player.width/2
+            else:
+                player.x = w_right + player.width/2
+        else:
+            if p_bottom > w_top > p_top:
+                player.y = w_top - player.height/2
+            else:
+                player.y = w_bottom + player.height/2
+
+    def _handle_player_key(self, player: Player, key: Key):
+        if not key in self._collision_groups[Key]:
+            return
+        player.key_collected()
+        key.destroy()
+
+    def _handle_player_hole(self, player: Player, hole: Hole):
+        if not hole in self._collision_groups[Hole]:
+            return
+        hole.destroy()
+        self._collision_groups[Hole].remove(hole)
+        if len(self._collision_groups[Hole]) != 0:
+            hole = self._collision_groups[Hole].pop(0)
+            hole.destroy()
+            player.x = hole.x
+            player.y = hole.y
+        else:
+            print('OUT OF HOLES')
+
+    def _handle_player_gates(self, player: Player, gates: Gates):
+        if not gates in self._collision_groups[Gates]:
+            return
+        if player.keys_collected == KEYS_NUMBER:
+            print('TRAVELING INTO THE DARK')
+
+    def _handle_enemy_player(self, enemy: Enemy, player: Player):
+        pass
+
+    @staticmethod
+    def _handle_enemy_wall(enemy: Enemy, wall: Wall):
+        pass
+

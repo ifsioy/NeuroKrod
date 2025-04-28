@@ -1,0 +1,44 @@
+@startuml
+
+left to right direction
+
+actor Player as player
+actor System as system
+
+rectangle Game {
+  (Начать игру) as start
+  (Управлять персонажем) as move
+  (Собрать ключ) as collect_key
+  (Телепортироваться через дыру) as use_hole
+  (Открыть дверь) as open_gate
+  (Просмотреть рекорды) as view_scores
+  (Завершить игру) as finish
+
+  (Сгенерировать лабиринт) as generate_maze
+  (Управлять ИИ Кротом) as ai_control
+  (Обработать коллизии) as handle_collisions
+  (Сохранить рекорд) as save_score
+
+  player --> start
+  player --> move
+  player --> collect_key
+  player --> use_hole
+  player --> open_gate
+  player --> view_scores
+  player --> finish
+
+  system --> generate_maze
+  system --> ai_control
+  system --> handle_collisions
+  system --> save_score
+
+  collect_key .> open_gate : <<include>>
+  use_hole .> handle_collisions : <<extend>>
+  open_gate .> save_score : <<include>>
+
+  start --> generate_maze : triggers
+  finish --> save_score : triggers
+  move --> handle_collisions : вызывает
+}
+
+@enduml

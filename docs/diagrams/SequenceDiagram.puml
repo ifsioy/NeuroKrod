@@ -1,0 +1,87 @@
+@startuml
+
+actor Player as player
+participant "Game" as game
+participant "Player" as p
+participant "CollisionSystem" as cs
+participant "Key" as key
+participant "Maze" as maze
+participant "Gates" as gates
+participant "DatabaseHandler" as db
+
+player -> game: Начать игру
+game -> maze: generate()
+maze --> game: Создан лабиринт
+game -> p: spawn()
+game -> cs: register_objects()
+
+
+
+loop Игровой цикл
+    participant "Hole" as hole
+
+    player -> p: move()
+    p -> cs: check_collisions()
+    cs -> hole: check_collision(p)
+    hole -> hole: get_random_linked_hole()
+    hole -> p: teleport(new_position)
+    p --> player: Позиция обновлена
+
+    participant "Enemy" as enemy
+
+    game -> enemy: update_ai()
+    enemy -> maze: get_player_position()
+    maze --> enemy: (x,y)
+    enemy -> enemy: calculate_path()
+    enemy -> enemy: move_towards_player()
+
+  player -> p: move(dx, dy)
+  activate p
+  p -> cs: check_collisions()
+  activate cs
+
+  cs -> key: check_collision(p)
+  activate key
+  key --> cs: collision = true
+  deactivate key
+
+  cs -> maze: remove_key(key)
+  activate maze
+  maze --> cs: keys_remaining--
+  deactivate maze
+
+  cs -> p: add_key()
+  activate p
+  p --> cs: keys_collected++
+  deactivate p
+
+  cs -> gates: check_unlock_condition()
+  activate gates
+  gates --> cs: unlocked? (keys == total)
+  deactivate gates
+
+  alt Условие открытия выполнено
+    cs -> gates: unlock()
+    activate gates
+    gates --> cs: is_locked = false
+    deactivate gates
+  end
+
+  cs --> p: Коллизии обработаны
+  deactivate cs
+
+  player -> gates: interact()
+  activate gates
+  gates -> game: level_complete()
+  activate game
+  game -> db: save_record(player_name, time)
+  activate db
+  db --> game: success
+  deactivate db
+  game --> player: Победа!
+  deactivate game
+  deactivate gates
+  deactivate p
+end
+
+@enduml

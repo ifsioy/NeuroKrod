@@ -1,5 +1,5 @@
 import pygame
-from hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE
+from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE
 
 
 class Camera:

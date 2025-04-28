@@ -1,0 +1,51 @@
+@startuml
+
+' Состояния игрока
+state Player {
+  [*] -> Idle
+  Idle --> Moving : Нажатие клавиш управления
+  Moving --> Idle : Остановка движения
+  Moving --> Hidden : Вход в дыру
+  Hidden --> Moving : Выход из дыры
+  Moving --> Dead : Столкновение с Кротом
+  Hidden --> Dead : Крот нашел в дыре
+  Moving --> Victorious : Открыл дверь
+  Victorious --> [*]
+  Dead --> [*]
+}
+
+' Состояния двери
+state Gates {
+  [*] -> Locked : Инициализация
+  Locked --> Unlocked : Все ключи собраны
+  Unlocked --> [*]
+}
+
+' Состояния ИИ-врага (Крота)
+state Enemy {
+  [*] -> Patrol : Патрулирование
+  Patrol --> Chase : Обнаружил игрока
+  Chase --> Patrol : Потерял игрока
+  Chase --> [*] : Поймал игрока
+}
+
+' Состояния ключа
+state Key {
+  [*] -> Active : Доступен
+  Active --> Collected : Собран игроком
+  Collected --> [*]
+}
+
+' Состояния игры
+state Game {
+  [*] -> Menu : Запуск
+  Menu --> Playing : Начать игру
+  Playing --> Paused : Пауза
+  Paused --> Playing : Продолжить
+  Playing --> GameOver : Игрок мертв
+  Playing --> Victory : Дверь открыта
+  GameOver --> Menu : Повторить
+  Victory --> Menu : В меню
+}
+
+@enduml

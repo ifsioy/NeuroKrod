@@ -1,0 +1,117 @@
+@startuml
+
+' Core Classes
+class GameObject {
+  -x: float
+  -y: float
+  -width: int
+  -height: int
+  +check_collision(other: GameObject): bool
+  +update(): void
+}
+
+class SeeingObject {
+  -rays: List<Ray>
+  +update_vision(): void
+}
+
+class Player {
+  -keys_collected: int
+  -is_hidden: bool
+  +move(dx: float, dy: float): void
+  +use_hole(hole: Hole): void
+}
+
+class Enemy {
+  -dqn_agent: DQNAgent
+  -target: Player
+  +update_ai(state: dict): void
+}
+
+' Objects
+class Wall {
+  -is_destructible: bool
+}
+
+class Key {
+  -is_collected: bool
+}
+
+class Hole {
+  -linked_holes: List<Hole>
+  +teleport(obj: GameObject): void
+}
+
+class Gates {
+  -is_locked: bool
+  +unlock(): void
+}
+
+' AI Components
+class DQNAgent {
+  -model: NeuralNetwork
+  +get_action(state: Tensor): int
+  +train(batch: ExperienceBuffer): void
+}
+
+' Systems
+class Maze {
+  -walls: List<Wall>
+  -keys: List<Key>
+  -holes: List<Hole>
+  -gates: Gates
+  +generate(): void
+  +get_state(): dict
+}
+
+class Camera {
+  -target: GameObject
+  -view_width: int
+  -view_height: int
+  +update_position(): void
+}
+
+class Ray {
+  -angle: float
+  -length: float
+  +cast(): List<float>
+}
+
+class CollisionSystem {
+  +check_all_collisions(): void
+  +resolve_collision(obj1: GameObject, obj2: GameObject): void
+}
+
+class DatabaseHandler {
+  +save_score(name: str, time: float): bool
+  +get_top_scores(limit: int): List<Score>
+}
+
+' Inheritance
+GameObject <|-- SeeingObject
+SeeingObject <|-- Player
+SeeingObject <|-- Enemy
+GameObject <|-- Wall
+GameObject <|-- Key
+GameObject <|-- Hole
+GameObject <|-- Gates
+
+' Composition
+Maze "1" *-- "many" Wall
+Maze "1" *-- "many" Key
+Maze "1" *-- "many" Hole
+Maze "1" *-- "1" Gates
+
+Enemy "1" *-- "1" DQNAgent
+SeeingObject "1" *-- "many" Ray
+
+' Associations
+Camera "1" --> "1" GameObject: follows
+CollisionSystem "1" --> "many" GameObject: checks
+Player "1" --> "many" Key: collects
+Hole "1" --> "many" Hole: linked to
+Game "1" --> "1" Maze: contains
+Game "1" --> "1" Player: controls
+Game "1" --> "1" Enemy: manages
+
+@enduml
