@@ -1,19 +1,21 @@
 import pygame
-from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE
+
+from src.game_objects.game_object import GameObject
+from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE, CAMERA_WIDTH, CAMERA_HEIGHT
 
 
 class Camera:
-    def __init__(self, target, width, height):
+    def __init__(self, target, width = CAMERA_WIDTH, height = CAMERA_HEIGHT):
         self.x = target.x
         self.y = target.y
         self.target = target
         self.width = width
         self.height = height
 
-    def apply(self, item):
-        return (W_SHIFT + (item.x - self.x - item.width / 2) * BASE_SIZE,
-                H_SHIFT + (item.y - self.y - item.height / 2) * BASE_SIZE,
-                item.width * BASE_SIZE, item.height * BASE_SIZE)
+    def world_to_screen(self, obj: GameObject):
+        return (W_SHIFT + (obj.x - self.x - obj.width / 2) * BASE_SIZE,
+                H_SHIFT + (obj.y - self.y - obj.height / 2) * BASE_SIZE,
+                obj.width * BASE_SIZE, obj.height * BASE_SIZE)
 
     def move(self):
         def adjust_position(current, target_pos, size):

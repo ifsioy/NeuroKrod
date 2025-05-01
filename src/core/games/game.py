@@ -9,6 +9,7 @@ from src.core.controllers.player_controller import PlayerController
 from src.core.event_system import EventSystem, EventType
 from src.core.games.base_game import BaseGame
 from src.game_objects.game_object import GameObject
+from src.rendering.drawer import Drawer
 from src.utils.hyper_parameters import *
 
 from src.core.maze import Maze
@@ -18,6 +19,7 @@ from src.game_objects.player import Player
 class Game(BaseGame):
     def __init__(self):
         super().__init__()
+        objects_to_add = list[GameObject]()
         self.game_objects = list[GameObject]()
         self.collision_system = CollisionSystem()
         self.event_system = EventSystem()
@@ -26,9 +28,9 @@ class Game(BaseGame):
 
         self.maze = Maze(MAZE_SIZE)
         for obj in self.maze.generate_maze():
-            self.add_object(obj)
+            objects_to_add.append(obj)
 
-        empty_cells = self.maze.find_empty_cells(self.game_objects)
+        empty_cells = self.maze.find_empty_cells(objects_to_add)
         players = list[Player]()
         players.append(Player(empty_cells[0][1] * CELL_WIDTH, empty_cells[0][0] * CELL_HEIGHT,
                                    PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
@@ -36,12 +38,19 @@ class Game(BaseGame):
         self.controllers = list[BaseController]()
         self.controllers.append(GameController(self))
         for player in players:
-            self.add_object(player)
+            objects_to_add.append(player)
             self.controllers.append(PlayerController(player))
 
-        self.camera = Camera(players[0], 0, 0)
+        self.camera = Camera(players[0])
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.drawer = Drawer(self.screen, self.camera)
+        self.event_system.subscribe(EventType.OBJECT_ADDED, self.drawer.on_object_added)
+        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.drawer.on_object_removed)
+
+        for obj in objects_to_add:
+            self.add_object(obj)
 
     def _cleanup_objects(self):
         for obj in self.game_objects[:]:
@@ -58,14 +67,8 @@ class Game(BaseGame):
         self.game_objects.remove(obj)
         self.event_system.notify(EventType.OBJECT_REMOVED, {'object' : obj})
 
-    def draw(self, objects):
-        if IS_TRAINING:
-            return
-        for game_object in objects:
-            game_object.draw(self.screen, self.camera)
-
     def update(self, dt: float):
-        self.screen.fill(BLACK)
+        self.screen.fill(COLOR_BLACK)
 
         events = pygame.event.get()
         for controller in self.controllers:
@@ -82,9 +85,7 @@ class Game(BaseGame):
         for hole in self.maze.dig_holes(self.game_objects):
             self.add_object(hole)
 
-        self.camera.update()
-        self.draw(self.game_objects)
-
+        self.drawer.draw_frame()
 
         if not IS_TRAINING:
             pygame.display.flip()
@@ -105,6 +106,6 @@ class Game(BaseGame):
                 print(fps)
                 tm = 0
                 fps = 0
-
-            if not IS_TRAINING:
-                pygame.time.Clock().tick(10)
+            #
+            # if not IS_TRAINING:
+            #     pygame.time.Clock().tick(100)
