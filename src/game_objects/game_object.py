@@ -13,7 +13,7 @@ class GameObject:
     def destroy(self):
         self.is_destroyed = True
 
-    def update(self, items):
+    def physics_update(self, dt: float):
         pass
 
     def draw(self, screen, camera):

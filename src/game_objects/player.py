@@ -1,49 +1,26 @@
 
 import pygame
-import math
+
+from src.game_objects.game_object import GameObject
 from src.utils.hyper_parameters import W_SHIFT, H_SHIFT, BASE_SIZE
-from src.rendering.seeing_object import SeeingObject
 
 
-class Player(SeeingObject):
-    def __init__(self, x, y, width, height, speed, cast_cooldown = 50):
-        super(Player, self).__init__(x, y, width, height, cast_cooldown)
+class Player(GameObject):
+    def __init__(self, x, y, width, height, speed):
+        super(Player, self).__init__(x, y, width, height)
         self.speed = speed
         self.keys_collected = 0
+        self.velocity = [0, 0]
 
-    def move(self, items):
-        keys = pygame.key.get_pressed()
-        pressed_lr = False
-        pressed_ud = False
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            pressed_lr ^= True
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            pressed_lr ^= True
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            pressed_ud ^= True
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            pressed_ud ^= True
+    def update_velocity(self, new_velocity: list[float]):
+        self.velocity = new_velocity
 
-        cur_speed = self.speed
-        if pressed_lr and pressed_ud:
-            cur_speed /= math.sqrt(2)
-
-        # print(pressed_lr, ' ', pressed_ud, ' ', cur_speed)
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.x += cur_speed
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.x -= cur_speed
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.y += cur_speed
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.y -= cur_speed
+    def physics_update(self, dt: float):
+        self.x += self.velocity[0] * dt * self.speed
+        self.y += self.velocity[1] * dt * self.speed
 
     def key_collected(self):
         self.keys_collected += 1
-
-    def update(self, items):
-        self.move(items)
-        super(Player, self).update(items)
 
     def draw(self, screen, camera):
         super(Player, self).draw(screen, camera)

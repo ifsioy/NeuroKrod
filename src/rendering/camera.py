@@ -3,9 +3,10 @@ from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE
 
 
 class Camera:
-    def __init__(self, x, y, width, height):
-        self.x = x
-        self.y = y
+    def __init__(self, target, width, height):
+        self.x = target.x
+        self.y = target.y
+        self.target = target
         self.width = width
         self.height = height
 
@@ -14,7 +15,7 @@ class Camera:
                 H_SHIFT + (item.y - self.y - item.height / 2) * BASE_SIZE,
                 item.width * BASE_SIZE, item.height * BASE_SIZE)
 
-    def move(self, target):
+    def move(self):
         def adjust_position(current, target_pos, size):
             if target_pos < current - size / 2:
                 return target_pos + size / 2
@@ -22,11 +23,11 @@ class Camera:
                 return target_pos - size / 2
             return current
 
-        self.x = adjust_position(self.x, target.x, self.width)
-        self.y = adjust_position(self.y, target.y, self.height)
+        self.x = adjust_position(self.x, self.target.x, self.width)
+        self.y = adjust_position(self.y, self.target.y, self.height)
 
-    def update(self, screen, target):
-        self.move(target)
+    def update(self):
+        self.move()
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), (W_SHIFT - self.width / 2 * BASE_SIZE,
