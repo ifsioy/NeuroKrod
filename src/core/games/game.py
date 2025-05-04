@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import pygame
 
+from src.ai.grid.grid_manager import GridManager
 from src.core.collision_system import CollisionSystem
 from src.core.controllers.base_controller import BaseController
 from src.core.controllers.game_controller import GameController
@@ -49,6 +50,10 @@ class Game(BaseGame):
         self.event_system.subscribe(EventType.OBJECT_ADDED, self.drawer.on_object_added)
         self.event_system.subscribe(EventType.OBJECT_REMOVED, self.drawer.on_object_removed)
 
+        self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)
+        for obj in objects_to_add:
+            self.grid_manager.add(obj)
+
         for obj in objects_to_add:
             self.add_object(obj)
 
@@ -68,7 +73,8 @@ class Game(BaseGame):
         self.event_system.notify(EventType.OBJECT_REMOVED, {'object' : obj})
 
     def update(self, dt: float):
-        self.screen.fill(COLOR_BLACK)
+        for obj in self.game_objects:
+            self.grid_manager.remove(obj)
 
         events = pygame.event.get()
         for controller in self.controllers:
@@ -85,10 +91,16 @@ class Game(BaseGame):
         for hole in self.maze.dig_holes(self.game_objects):
             self.add_object(hole)
 
-        self.drawer.draw_frame()
+        for obj in self.game_objects:
+            self.grid_manager.add(obj)
 
-        if not IS_TRAINING:
-            pygame.display.flip()
+
+        for x in range(MAZE_SIZE):
+            for y in range(MAZE_SIZE):
+                cell = self.grid_manager.get_cell(x, y)
+
+
+        self.drawer.draw_frame()
 
     def run(self):
         self.is_running = True
@@ -106,6 +118,6 @@ class Game(BaseGame):
                 print(fps)
                 tm = 0
                 fps = 0
-            #
+
             # if not IS_TRAINING:
             #     pygame.time.Clock().tick(100)

@@ -1,7 +1,6 @@
 import pygame
 
 from src.rendering.components.render_component import RenderComponent
-from src.utils.hyper_parameters import COLOR_WHITE
 
 
 class ShapeComponent(RenderComponent):
@@ -10,7 +9,7 @@ class ShapeComponent(RenderComponent):
     def __init__(self, color: tuple):
         self.color = color
 
-    def draw(self, screen: pygame.Surface, pos: tuple):
-        x, y, width, height = pos
+    def draw(self, screen: pygame.Surface, position: tuple):
+        x, y, width, height = position
         rect = pygame.Rect(x, y, width, height)
         pygame.draw.rect(screen, self.color, rect)
