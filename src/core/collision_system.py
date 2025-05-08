@@ -101,7 +101,7 @@ class CollisionSystem:
         overlap_x = min(p_right - w_left, w_right - p_left)
         overlap_y = min(p_bottom - w_top, w_bottom - p_top)
 
-        if overlap_x < overlap_y or (overlap_x == overlap_y and obj.velocity[0] > obj.velocity[1]):
+        if overlap_x < overlap_y:
             if p_right > w_left > p_left:
                 obj.x = w_left - obj.width / 2
             else:

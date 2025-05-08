@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pygame
 
-from src.ai.grid.grid_manager import GridManager
+from src.core.grid.grid_manager import GridManager
 from src.core.collision_system import CollisionSystem
 from src.core.controllers.base_controller import BaseController
 from src.core.controllers.enemy_controller import EnemyController
@@ -92,7 +92,7 @@ class Game(BaseGame):
     def draw(self):
         if self.drawer is None:
             return
-        self.drawer.draw_frame()
+        self.drawer.draw_frame(self.grid_manager)
 
     def update(self, dt: float):
         for obj in self.game_objects:
@@ -118,6 +118,7 @@ class Game(BaseGame):
 
         self.draw()
 
+
     def run(self):
         self.is_running = True
         fps = 0
@@ -135,4 +136,4 @@ class Game(BaseGame):
                 tm = 0
                 fps = 0
 
-            # pygame.time.Clock().tick(15)
+            pygame.time.Clock().tick(15)

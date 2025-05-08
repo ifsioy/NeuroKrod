@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Type
 
 from src.game_objects.game_object import GameObject
@@ -10,7 +10,8 @@ class Cell:
         self.x = x
         self.y = y
         self.objects: Dict[Type, GameObject] = {}
-        self.last_player_visit = datetime.now()
+        self.last_player_visit: datetime = datetime.now()
+        self.last_player_visit -= timedelta(hours=5)
 
     def add_object(self, obj: GameObject) -> bool:
         obj_type = type(obj)

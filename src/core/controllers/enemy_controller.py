@@ -1,11 +1,11 @@
 import math
 import random
 
-from src.core.controllers.base_controller import BaseController
+from src.core.controllers.ai_controller import AIController
 from src.game_objects.enemy import Enemy
 
 
-class EnemyController(BaseController):
+class EnemyController(AIController):
     def __init__(self, enemy: Enemy):
         super().__init__()
         self.enemy = enemy

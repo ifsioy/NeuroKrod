@@ -12,6 +12,7 @@ sys.setrecursionlimit(10**9)
 pygame.init()
 
 game = Game()
+# screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 drawer = Drawer(screen)
 game.set_drawer(drawer)
