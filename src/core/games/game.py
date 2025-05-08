@@ -5,12 +5,13 @@ import pygame
 from src.ai.grid.grid_manager import GridManager
 from src.core.collision_system import CollisionSystem
 from src.core.controllers.base_controller import BaseController
+from src.core.controllers.enemy_controller import EnemyController
 from src.core.controllers.game_controller import GameController
 from src.core.controllers.player_controller import PlayerController
 from src.core.event_system import EventSystem, EventType
 from src.core.games.base_game import BaseGame
+from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
-from src.rendering.drawer import Drawer
 from src.utils.hyper_parameters import *
 
 from src.core.maze import Maze
@@ -31,24 +32,29 @@ class Game(BaseGame):
         for obj in self.maze.generate_maze():
             objects_to_add.append(obj)
 
+        self.controllers = list[BaseController]()
+        self.controllers.append(GameController(self))
+
         empty_cells = self.maze.find_empty_cells(objects_to_add)
         players = list[Player]()
         players.append(Player(empty_cells[0][1] * CELL_WIDTH, empty_cells[0][0] * CELL_HEIGHT,
-                                   PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
+                              PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
 
-        self.controllers = list[BaseController]()
-        self.controllers.append(GameController(self))
         for player in players:
             objects_to_add.append(player)
             self.controllers.append(PlayerController(player))
 
+        enemies = list[Enemy]()
+        enemies.append(Enemy(empty_cells[-1][1] * CELL_WIDTH, empty_cells[-1][0] * CELL_HEIGHT,
+                             ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED))
+
+        for enemy in enemies:
+            objects_to_add.append(enemy)
+            self.controllers.append(EnemyController(enemy))
+
+
         self.camera = Camera(players[0])
-
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-        self.drawer = Drawer(self.screen, self.camera)
-        self.event_system.subscribe(EventType.OBJECT_ADDED, self.drawer.on_object_added)
-        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.drawer.on_object_removed)
+        self.drawer = None
 
         self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)
         for obj in objects_to_add:
@@ -56,6 +62,17 @@ class Game(BaseGame):
 
         for obj in objects_to_add:
             self.add_object(obj)
+
+    def set_drawer(self, drawer):
+        if self.drawer is not None:
+            self.event_system.unsubscribe(EventType.OBJECT_ADDED, self.drawer.on_object_added)
+            self.event_system.unsubscribe(EventType.OBJECT_REMOVED, self.drawer.on_object_added)
+        self.drawer = drawer
+        self.event_system.subscribe(EventType.OBJECT_ADDED, self.drawer.on_object_added)
+        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.drawer.on_object_removed)
+        self.drawer.set_camera(self.camera)
+        for obj in self.game_objects:
+            self.drawer.register_object(obj)
 
     def _cleanup_objects(self):
         for obj in self.game_objects[:]:
@@ -71,6 +88,11 @@ class Game(BaseGame):
             return
         self.game_objects.remove(obj)
         self.event_system.notify(EventType.OBJECT_REMOVED, {'object' : obj})
+
+    def draw(self):
+        if self.drawer is None:
+            return
+        self.drawer.draw_frame()
 
     def update(self, dt: float):
         for obj in self.game_objects:
@@ -94,13 +116,7 @@ class Game(BaseGame):
         for obj in self.game_objects:
             self.grid_manager.add(obj)
 
-
-        for x in range(MAZE_SIZE):
-            for y in range(MAZE_SIZE):
-                cell = self.grid_manager.get_cell(x, y)
-
-
-        self.drawer.draw_frame()
+        self.draw()
 
     def run(self):
         self.is_running = True
@@ -119,5 +135,4 @@ class Game(BaseGame):
                 tm = 0
                 fps = 0
 
-            # if not IS_TRAINING:
-            #     pygame.time.Clock().tick(100)
+            # pygame.time.Clock().tick(15)

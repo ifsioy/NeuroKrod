@@ -6,6 +6,7 @@ from src.game_objects.game_object import GameObject
 from src.game_objects.gates import Gates
 from src.game_objects.hole import Hole
 from src.game_objects.key import Key
+from src.game_objects.movable import Movable
 from src.game_objects.player import Player
 from src.game_objects.wall import Wall
 from src.utils.hyper_parameters import KEYS_NUMBER
@@ -23,12 +24,12 @@ class CollisionSystem:
         }
 
         self._collision_handlers: Dict[tuple, Callable] = {
-            (Player, Wall): self._handle_player_wall,
+            (Player, Wall): self._handle_movable_wall,
             (Player, Key): self._handle_player_key,
             (Player, Hole): self._handle_player_hole,
             (Player, Gates): self._handle_player_gates,
             (Enemy, Player): self._handle_enemy_player,
-            (Enemy, Wall): self._handle_enemy_wall
+            (Enemy, Wall): self._handle_movable_wall
         }
 
     def on_object_added(self, data : dict):
@@ -93,23 +94,24 @@ class CollisionSystem:
             self._check_collisions_for(enemy)
 
     @staticmethod
-    def _handle_player_wall(player: Player, wall: Wall):
-        p_left, p_right, p_top, p_bottom = CollisionSystem._get_object_bounds(player)
+    def _handle_movable_wall(obj: Movable, wall: Wall):
+        p_left, p_right, p_top, p_bottom = CollisionSystem._get_object_bounds(obj)
         w_left, w_right, w_top, w_bottom = CollisionSystem._get_object_bounds(wall)
 
         overlap_x = min(p_right - w_left, w_right - p_left)
         overlap_y = min(p_bottom - w_top, w_bottom - p_top)
 
-        if overlap_x < overlap_y:
+        if overlap_x < overlap_y or (overlap_x == overlap_y and obj.velocity[0] > obj.velocity[1]):
             if p_right > w_left > p_left:
-                player.x = w_left - player.width/2
+                obj.x = w_left - obj.width / 2
             else:
-                player.x = w_right + player.width/2
+                obj.x = w_right + obj.width / 2
         else:
             if p_bottom > w_top > p_top:
-                player.y = w_top - player.height/2
+                obj.y = w_top - obj.height / 2
             else:
-                player.y = w_bottom + player.height/2
+                obj.y = w_bottom + obj.height / 2
+
 
     def _handle_player_key(self, player: Player, key: Key):
         if not key in self._collision_groups[Key]:
@@ -137,9 +139,5 @@ class CollisionSystem:
             print('TRAVELING INTO THE DARK')
 
     def _handle_enemy_player(self, enemy: Enemy, player: Player):
-        pass
-
-    @staticmethod
-    def _handle_enemy_wall(enemy: Enemy, wall: Wall):
         pass
 

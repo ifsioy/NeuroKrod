@@ -14,8 +14,8 @@ class GridManager:
     @staticmethod
     def world_to_grid(x: int, y: int) -> tuple:
         return (
-            int(x // CELL_WIDTH),
-            int(y // CELL_HEIGHT)
+            int((x + CELL_WIDTH // 2) // CELL_WIDTH),
+            int((y + CELL_HEIGHT // 2) // CELL_HEIGHT)
         )
 
     def get_cell(self, x: int, y: int) -> Cell:

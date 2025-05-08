@@ -10,7 +10,7 @@ class Cell:
         self.x = x
         self.y = y
         self.objects: Dict[Type, GameObject] = {}
-        self.last_player_visit = 0
+        self.last_player_visit = datetime.now()
 
     def add_object(self, obj: GameObject) -> bool:
         obj_type = type(obj)
