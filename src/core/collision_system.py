@@ -1,5 +1,7 @@
 from typing import List, Dict, Type, Callable
 
+import pygame
+
 from src.core.event_system import EventSystem, EventType
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
@@ -9,7 +11,7 @@ from src.game_objects.key import Key
 from src.game_objects.movable import Movable
 from src.game_objects.player import Player
 from src.game_objects.wall import Wall
-from src.utils.hyper_parameters import KEYS_NUMBER
+from src.utils.hyper_parameters import KEYS_NUMBER, CAUGHT, WIN, HOLE_USED, KEY_COLLECTED
 
 
 class CollisionSystem:
@@ -118,6 +120,7 @@ class CollisionSystem:
             return
         player.key_collected()
         key.destroy()
+        pygame.event.post(KEY_COLLECTED)
 
     def _handle_player_hole(self, player: Player, hole: Hole):
         if not hole in self._collision_groups[Hole]:
@@ -129,6 +132,7 @@ class CollisionSystem:
             hole.destroy()
             player.x = hole.x
             player.y = hole.y
+            pygame.event.post(HOLE_USED)
         else:
             print('OUT OF HOLES')
 
@@ -137,7 +141,9 @@ class CollisionSystem:
             return
         if player.keys_collected == KEYS_NUMBER:
             print('TRAVELING INTO THE DARK')
+            pygame.event.post(WIN)
 
-    def _handle_enemy_player(self, enemy: Enemy, player: Player):
-        pass
+    @staticmethod
+    def _handle_enemy_player(enemy: Enemy, player: Player):
+        pygame.event.post(CAUGHT)
 

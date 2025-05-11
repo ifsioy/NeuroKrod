@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Dict, Type
 
+from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
 from src.game_objects.player import Player
 
@@ -12,6 +13,8 @@ class Cell:
         self.objects: Dict[Type, GameObject] = {}
         self.last_player_visit: datetime = datetime.now()
         self.last_player_visit -= timedelta(hours=5)
+        self.last_enemy_visit: datetime = datetime.now()
+        self.last_enemy_visit -= timedelta(hours=5)
 
     def add_object(self, obj: GameObject) -> bool:
         obj_type = type(obj)
@@ -20,6 +23,8 @@ class Cell:
         self.objects[obj_type] = obj
         if obj_type == Player:
             self.on_player_enter()
+        if obj_type == Enemy:
+            self.on_enemy_enter()
         return True
 
     def remove_object(self, obj: GameObject) -> bool:
@@ -37,5 +42,8 @@ class Cell:
 
     def on_player_enter(self):
         self.last_player_visit = datetime.now()
+
+    def on_enemy_enter(self):
+        self.last_enemy_visit = datetime.now()
 
     

@@ -31,8 +31,19 @@ class GridManager:
         x, y = self.world_to_grid(obj.x, obj.y)
         self.get_cell(x, y).add_object(obj)
 
-    def get_cells_in_area(self, obj: GameObject, width: int, height: int) -> List[List[Cell]]:
+    def get_object_offset(self, obj: GameObject) -> tuple:
+        grid_x, grid_y = self.world_to_grid(obj.x, obj.y)
+        cell_center_x = grid_x * CELL_WIDTH
+        cell_center_y = grid_y * CELL_HEIGHT
+
+        offset_x = (obj.x - cell_center_x) / (CELL_WIDTH / 2)
+        offset_y = (obj.y - cell_center_y) / (CELL_HEIGHT / 2)
+
+        return offset_x, offset_y
+
+
+    def get_cells_in_area(self, obj: GameObject, width: int, height: int) -> List[Cell]:
         centre_x, centre_y = self.world_to_grid(obj.x, obj.y)
-        return [[self.get_cell(x, y)
-                for y in range(centre_y - height // 2, centre_y + height // 2 + 1)]
+        return [self.get_cell(x, y)
+                for y in range(centre_y - height // 2, centre_y + height // 2 + 1)
                 for x in range(centre_x - width // 2, centre_x + width // 2 + 1)]

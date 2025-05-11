@@ -1,17 +1,17 @@
 import math
 import random
 
-from src.core.controllers.ai_controller import AIController
-from src.game_objects.enemy import Enemy
+from src.core.controllers.base_controller import BaseController
+from src.game_objects.movable import Movable
 
 
-class EnemyController(AIController):
-    def __init__(self, enemy: Enemy):
+class RandController(BaseController):
+    def __init__(self, obj: Movable):
         super().__init__()
-        self.enemy = enemy
+        self.obj = obj
         self.velocity = [0, 0]
 
-    def handle_input(self, events):
+    def handle(self, events):
         self.velocity = [0, 0]
 
         if random.randint(0, 1) == 1:
@@ -36,4 +36,4 @@ class EnemyController(AIController):
 
 
     def update(self):
-        self.enemy.update_velocity(self.velocity)
+        self.obj.update_velocity(self.velocity)

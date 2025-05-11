@@ -18,7 +18,7 @@ class PlayerController(BaseController):
         self.velocity = [0, 0]
 
 
-    def handle_input(self, events):
+    def handle(self, events):
         pressed = pygame.key.get_pressed()
 
         self.velocity = [0, 0]

@@ -1,6 +1,6 @@
 import pygame
 
-BASE_SIZE = 15
+BASE_SIZE = 3
 
 CELL_WIDTH = 30
 CELL_HEIGHT = 30
@@ -9,7 +9,7 @@ pygame.init()
 # SCREEN_WIDTH = pygame.display.Info().current_w
 # SCREEN_HEIGHT = pygame.display.Info().current_h
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 1500, 1500
+SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 1000
 
 W_SHIFT = SCREEN_WIDTH // 2
 H_SHIFT = SCREEN_HEIGHT // 2
@@ -18,7 +18,7 @@ PLAYER_SPEED = 50
 PLAYER_WIDTH = CELL_WIDTH // 5
 PLAYER_HEIGHT = CELL_HEIGHT // 4
 
-ENEMY_SPEED = 75
+ENEMY_SPEED = 60
 ENEMY_WIDTH = CELL_WIDTH // 3
 ENEMY_HEIGHT = CELL_HEIGHT // 3
 
@@ -39,9 +39,30 @@ HOLE_WIDTH = CELL_WIDTH // 4
 HOLE_HEIGHT = CELL_HEIGHT // 4
 
 CAMERA_WIDTH = 0 #CELL_WIDTH // 6
-CAMERA_HEIGHT =0 #CELL_HEIGHT // 6
+CAMERA_HEIGHT = 0 #CELL_HEIGHT // 6
 
 RAYS_NUMBER = 16
+
+
+CAUGHT_EVENT        = pygame.USEREVENT + 1
+WIN_EVENT           = pygame.USEREVENT + 2
+KEY_COLLECTED_EVENT = pygame.USEREVENT + 3
+HOLE_USED_EVENT     = pygame.USEREVENT + 4
+
+
+
+CAUGHT        = pygame.event.Event(pygame.USEREVENT + 1, message ="CAUGHT", value = 0)
+WIN           = pygame.event.Event(pygame.USEREVENT + 2, message ="WIN", value = 0)
+KEY_COLLECTED = pygame.event.Event(pygame.USEREVENT + 3, message ="KEY_COLLECTED", value = 0)
+HOLE_USED     = pygame.event.Event(pygame.USEREVENT + 4, message ="HOLE_USED", value = 0)
+
+
+AREA_WIDTH = 7
+AREA_HEIGHT = 5
+GAME_DURATION = 30
+TRAINING_FPS = 15
+GAME_COUNT = 64
+
 
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)

@@ -1,3 +1,5 @@
+from datetime import timedelta, datetime
+
 import pygame
 
 from src.core.grid.grid_manager import GridManager
@@ -11,6 +13,7 @@ class Drawer:
         self.screen = screen
         self.camera = camera
         self.render_components = {}
+        self.is_disabled = False
 
     def set_camera(self, camera: Camera):
         self.camera = camera
@@ -38,6 +41,8 @@ class Drawer:
         self.unregister_object(obj)
 
     def draw_frame(self, grid_manager: GridManager = None):
+        if self.is_disabled:
+            return
         self.camera.update()
         self.screen.fill((0, 0, 0))
 
@@ -55,24 +60,25 @@ class Drawer:
 
         cells = grid_manager.get_cells_in_area(self.camera.target, 7, 5)
 
-        for cell_list in cells:
-            for cell in cell_list:
-                objects = [t.__name__ for t in cell.objects.keys()]
-                time_str = str(cell.last_player_visit.hour) + ' '
-                time_str += str(cell.last_player_visit.minute) + ' '
-                time_str += str(cell.last_player_visit.second) + ' '
-                time_str += str(cell.last_player_visit.microsecond)
+        for cell in cells:
+            objects = [t.__name__ for t in cell.objects.keys()]
+            time_str = str(cell.last_enemy_visit.hour) + ' '
+            time_str += str(cell.last_enemy_visit.minute) + ' '
+            time_str += str(cell.last_enemy_visit.second) + ' '
+            time_str += str(cell.last_enemy_visit.microsecond)
 
-                text = f"{objects}"
+            time_str_sec = str(timedelta.total_seconds(datetime.now() - cell.last_player_visit))
 
-                font = pygame.font.Font(None, 20)
-                text_surface = font.render(text, True, (255, 255, 255))
-                text_rect = text_surface.get_rect()
-                obj = GameObject(CELL_WIDTH * cell.x + CELL_WIDTH // 2,
-                                 CELL_HEIGHT * cell.y + CELL_HEIGHT // 2,
-                                 CELL_WIDTH, CELL_HEIGHT)
+            text = f"{time_str_sec}"
 
-                pos = self.camera.world_to_screen(obj)
-                text_rect.center = (pos[0], pos[1])
+            font = pygame.font.Font(None, 20)
+            text_surface = font.render(text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect()
+            obj = GameObject(CELL_WIDTH * cell.x + CELL_WIDTH // 2,
+                             CELL_HEIGHT * cell.y + CELL_HEIGHT // 2,
+                             CELL_WIDTH, CELL_HEIGHT)
 
-                self.screen.blit(text_surface, text_rect)
+            pos = self.camera.world_to_screen(obj)
+            text_rect.center = (pos[0], pos[1])
+
+            self.screen.blit(text_surface, text_rect)
