@@ -1,5 +1,4 @@
 import math
-from random import random
 
 import numpy as np
 import torch
@@ -26,6 +25,13 @@ class AIController(BaseController):
 
         self.velocity = [0, 0]
 
+    @staticmethod
+    def get_actions(states):
+
+        actions = []
+
+        return actions
+
     def get_action(self):
         self.frame_idx += 1
 
@@ -40,8 +46,9 @@ class AIController(BaseController):
         if np.random.random() < eps:
             return np.random.randint(0, self.config.action_size)
 
-        state_t = torch.FloatTensor(state).to(self.dqn.device)
-        q_values = self.dqn.model(state_t)
+        self.dqn.model.eval()
+        state_t = torch.FloatTensor(state).to(self.dqn.device).unsqueeze(0)
+        q_values = self.dqn.model(state_t)[0]
         return q_values.argmax().item()
 
     def handle(self, events):

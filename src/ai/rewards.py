@@ -15,7 +15,7 @@ class RewardTracker:
 
         current_distance = self._calculate_distance(player, enemy)
         if self.last_distance is not None:
-            player_reward += 1 if current_distance > self.last_distance else -1
+            player_reward += 1 if current_distance >= self.last_distance else -1
             enemy_reward += -1 if current_distance > self.last_distance else +1
 
         self.last_distance = current_distance

@@ -22,8 +22,12 @@ class DQNTrainer:
         next_states = torch.FloatTensor(next_states).to(self.model.device)
         dones = torch.FloatTensor(dones).to(self.model.device)
 
+        self.model.target_model.eval()
+        self.model.model.train()
+
         current_q = self.model.model(states).gather(1, actions.unsqueeze(1))
-        next_q = self.model.model(next_states).max(1)[0]
+        with torch.no_grad():
+            next_q = self.model.target_model(next_states).max(1)[0].detach()
         target_q = rewards + (1 - dones) * self.config.gamma * next_q
 
         loss = self.model.loss(current_q.squeeze(), target_q)
