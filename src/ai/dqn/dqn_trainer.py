@@ -13,7 +13,7 @@ class DQNTrainer:
 
     def train_step(self):
         if len(self.buffer) < self.config.batch_size:
-            return
+            return 0
 
         states, actions, rewards, next_states, dones = self.buffer.sample(self.config.batch_size)
         states = torch.FloatTensor(states).to(self.model.device)
@@ -34,3 +34,5 @@ class DQNTrainer:
         self.model.optimizer.zero_grad()
         loss.backward()
         self.model.optimizer.step()
+
+        return loss.item()

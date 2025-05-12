@@ -10,26 +10,26 @@ class RewardTracker:
         self.last_distance = None
 
     def calculate_rewards(self, player: Movable, enemy: Movable, events) -> tuple:
-        player_reward = 0
-        enemy_reward = 0
+        player_reward = -0.05
+        enemy_reward = -0.05
 
         current_distance = self._calculate_distance(player, enemy)
         if self.last_distance is not None:
-            player_reward += 0.1 if current_distance >= self.last_distance else -0.1
-            enemy_reward += -0.1 if current_distance > self.last_distance else +0.1
+            player_reward += 0.1 if current_distance > self.last_distance else 0
+            enemy_reward += 0.1 if current_distance < self.last_distance else 0
 
         self.last_distance = current_distance
 
         for event in events:
             if event.type == CAUGHT_EVENT:
-                player_reward -= 100
-                enemy_reward += 100
+                player_reward -= 25
+                enemy_reward += 25
             if event.type == WIN_EVENT:
-                player_reward += 100
-                enemy_reward -= 100
+                player_reward += 25
+                enemy_reward -= 25
             if event.type == KEY_COLLECTED_EVENT:
-                player_reward += 20
-                enemy_reward -= 10
+                player_reward += 5
+                enemy_reward -= 2.5
 
         return player_reward, enemy_reward
 
