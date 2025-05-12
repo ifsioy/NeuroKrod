@@ -40,10 +40,10 @@ class Drawer:
         obj = data['object']
         self.unregister_object(obj)
 
-    def draw_frame(self, grid_manager: GridManager = None):
+    def draw_frame(self, dt, grid_manager: GridManager = None):
         if self.is_disabled:
             return
-        self.camera.update()
+        self.camera.update(dt)
         self.screen.fill((0, 0, 0))
 
         for component_type in sorted(self.render_components, key = lambda x: x.Z_ORDER):

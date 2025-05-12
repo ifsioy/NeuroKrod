@@ -28,8 +28,8 @@ class StateEncoder:
             player_smell.append(cell.last_player_visit)
 
         for i in range(len(player_smell)):
-            player_smell[i] = math.log(timedelta.total_seconds(cur_time - player_smell[i]))
-            enemy_smell[i] = math.log(timedelta.total_seconds(cur_time - enemy_smell[i]))
+            player_smell[i] = math.log(1 + timedelta.total_seconds(cur_time - player_smell[i]))
+            enemy_smell[i] = math.log(1 + timedelta.total_seconds(cur_time - enemy_smell[i]))
 
         max_smell = max(max(player_smell), max(enemy_smell))
 

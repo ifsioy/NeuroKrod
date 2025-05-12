@@ -95,10 +95,10 @@ class Game(BaseGame):
         self.game_objects.remove(obj)
         self.event_system.notify(EventType.OBJECT_REMOVED, {'object' : obj})
 
-    def draw(self):
+    def draw(self, dt):
         if self.drawer is None:
             return
-        self.drawer.draw_frame()
+        self.drawer.draw_frame(dt)
 
     def step(self, dt: float):
         for obj in self.game_objects:
@@ -122,7 +122,7 @@ class Game(BaseGame):
         for obj in self.game_objects:
             self.grid_manager.add(obj)
 
-        self.draw()
+        self.draw(dt)
 
     def run(self):
         self.is_running = True
@@ -141,4 +141,4 @@ class Game(BaseGame):
                 tm = 0
                 fps = 0
 
-            # pygame.time.Clock().tick(15)
+            pygame.time.Clock().tick(15)
