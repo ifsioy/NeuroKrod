@@ -64,7 +64,7 @@ class Game(BaseGame):
         for obj in objects_to_add:
             self.add_object(obj)
 
-        self.events = None
+        self.events = []
 
         self.is_running = True
         self.start_time = datetime.now()
@@ -100,27 +100,33 @@ class Game(BaseGame):
             return
         self.drawer.draw_frame(dt)
 
+    def handle_events(self):
+        for controller in self.controllers:
+            controller.handle(self.events)
+
     def step(self, dt: float):
         for obj in self.game_objects:
             self.grid_manager.remove(obj)
 
-        self.events = pygame.event.get()
-        for controller in self.controllers:
-            controller.handle(self.events)
+        self.handle_events()
 
-        for game_object in self.game_objects:
-            game_object.physics_update(dt)
+        t = 0
+        while t < dt:
+            for game_object in self.game_objects:
+                game_object.physics_update(min(UT, dt - t))
+            t += UT
+            self.collision_system.check_collisions()
+            for game_object in self.game_objects:
+                if game_object.is_destroyed:
+                    self.remove_object(game_object)
 
-        for game_object in self.game_objects:
-            if game_object.is_destroyed:
-                self.remove_object(game_object)
-
-        self.collision_system.check_collisions()
-        for hole in self.maze.dig_holes(self.game_objects):
-            self.add_object(hole)
+            for hole in self.maze.dig_holes(self.game_objects):
+                self.add_object(hole)
 
         for obj in self.game_objects:
             self.grid_manager.add(obj)
+
+        self.events = pygame.event.get()
 
         self.draw(dt)
 
@@ -141,4 +147,4 @@ class Game(BaseGame):
                 tm = 0
                 fps = 0
 
-            pygame.time.Clock().tick(15)
+            # pygame.time.Clock().tick(15)

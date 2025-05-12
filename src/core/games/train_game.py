@@ -92,10 +92,7 @@ class TrainGame(Game):
     def get_action(self) -> tuple:
         return self.action[0], self.action[1]
 
-    def step(self, dt: float):
-        for obj in self.game_objects:
-            self.grid_manager.remove(obj)
-
+    def handle_events(self):
         for controller in self.controllers:
             action = controller.handle(self.events)
 
@@ -104,20 +101,3 @@ class TrainGame(Game):
                     self.action[1] = action
                 elif type(controller.obj) == Player:
                     self.action[0] = action
-
-        for game_object in self.game_objects:
-            game_object.physics_update(dt)
-
-        for game_object in self.game_objects:
-            if game_object.is_destroyed:
-                self.remove_object(game_object)
-
-        self.collision_system.check_collisions()
-        for hole in self.maze.dig_holes(self.game_objects):
-            self.add_object(hole)
-
-        for obj in self.game_objects:
-            self.grid_manager.add(obj)
-
-        self.draw()
-        self.events = pygame.event.get()

@@ -73,11 +73,6 @@ class CollisionSystem:
                 a_top < b_bottom and
                 a_bottom > b_top)
 
-    @staticmethod
-    def _ray_collision(a: GameObject, b: GameObject):
-        a_left, a_right, a_top, a_bottom = CollisionSystem._get_object_bounds(a)
-        b_left, b_right, b_top, b_bottom = CollisionSystem._get_object_bounds(b)
-
     def _resolve_collision(self, obj: GameObject, other: GameObject):
         handler = self._collision_handlers.get((type(obj), type(other)))
         if handler:
@@ -150,4 +145,3 @@ class CollisionSystem:
     @staticmethod
     def _handle_enemy_player(enemy: Enemy, player: Player):
         pygame.event.post(CAUGHT)
-
