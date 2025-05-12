@@ -2,7 +2,6 @@ from typing import List, Dict, Type, Callable
 
 import pygame
 
-from src.core.event_system import EventSystem, EventType
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
 from src.game_objects.gates import Gates
@@ -73,6 +72,11 @@ class CollisionSystem:
                 a_right > b_left and
                 a_top < b_bottom and
                 a_bottom > b_top)
+
+    @staticmethod
+    def _ray_collision(a: GameObject, b: GameObject):
+        a_left, a_right, a_top, a_bottom = CollisionSystem._get_object_bounds(a)
+        b_left, b_right, b_top, b_bottom = CollisionSystem._get_object_bounds(b)
 
     def _resolve_collision(self, obj: GameObject, other: GameObject):
         handler = self._collision_handlers.get((type(obj), type(other)))

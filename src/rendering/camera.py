@@ -1,16 +1,17 @@
 import pygame
 
 from src.game_objects.game_object import GameObject
-from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE, CAMERA_WIDTH, CAMERA_HEIGHT
+from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE, CAMERA_WIDTH, CAMERA_HEIGHT, CAMERA_SMOOTHNESS
 
 
 class Camera:
-    def __init__(self, target, width = CAMERA_WIDTH, height = CAMERA_HEIGHT):
+    def __init__(self, target, width = CAMERA_WIDTH, height = CAMERA_HEIGHT, smoothness = CAMERA_SMOOTHNESS):
         self.x = target.x
         self.y = target.y
         self.target = target
         self.width = width
         self.height = height
+        self.smoothness = smoothness
 
     def world_to_screen(self, obj: GameObject):
         return (W_SHIFT + (obj.x - self.x - obj.width / 2) * BASE_SIZE,
@@ -19,14 +20,13 @@ class Camera:
 
     def move(self):
         def adjust_position(current, target_pos, size):
-            if target_pos < current - size / 2:
-                return target_pos + size / 2
-            elif target_pos > current + size / 2:
-                return target_pos - size / 2
-            return current
+            if (target_pos < current - size / 2 or
+                target_pos > current + size / 2):
+                return (target_pos - current) * self.smoothness
+            return 0
 
-        self.x = adjust_position(self.x, self.target.x, self.width)
-        self.y = adjust_position(self.y, self.target.y, self.height)
+        self.x += adjust_position(self.x, self.target.x, self.width)
+        self.y += adjust_position(self.y, self.target.y, self.height)
 
     def update(self):
         self.move()
