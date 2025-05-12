@@ -1,6 +1,8 @@
 import math
 from datetime import datetime, timedelta
 
+import torch
+
 from src.ai.utils.config import DQNConfig
 from src.core.grid.grid_manager import GridManager
 from src.game_objects.enemy import Enemy
@@ -47,4 +49,4 @@ class StateEncoder:
                     x_offset, y_offset = self.grid_manager.get_object_offset(cells[i].objects[obj_type])
                     state.extend([1, x_offset, y_offset, player_smell[i], enemy_smell[i]])
 
-        return state
+        return torch.tensor(state, dtype=torch.float32)

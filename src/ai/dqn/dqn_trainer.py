@@ -16,10 +16,10 @@ class DQNTrainer:
             return 0
 
         states, actions, rewards, next_states, dones = self.buffer.sample(self.config.batch_size)
-        states = torch.FloatTensor(states).to(self.model.device)
+        states = torch.Tensor(states).to(self.model.device)
         actions = torch.LongTensor(actions).to(self.model.device)
         rewards = torch.FloatTensor(rewards).to(self.model.device)
-        next_states = torch.FloatTensor(next_states).to(self.model.device)
+        next_states = torch.Tensor(next_states).to(self.model.device)
         dones = torch.FloatTensor(dones).to(self.model.device)
 
         self.model.target_model.eval()

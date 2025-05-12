@@ -1,6 +1,6 @@
 import pygame
 
-BASE_SIZE = 5
+BASE_SIZE = 3
 
 CELL_WIDTH = 30
 CELL_HEIGHT = 30

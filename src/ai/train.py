@@ -12,19 +12,14 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
     os.makedirs(save_path, exist_ok=True)
     mean_player_reward = 0
     mean_enemy_reward = 0
-    const_for_idk = 1
+    mean_player_loss = 0
+    mean_enemy_loss = 0
+    alpha = 0.99
     logs = Logs()
 
     while True:
         player_state, player_action, player_new_states, player_rewards, player_done, \
         enemy_state, enemy_action, enemy_new_states, enemy_rewards, enemy_done = game_manager.parallel_step()
-
-        mean_player_reward = (mean_player_reward * ((const_for_idk - 1) / const_for_idk) +
-                              sum(player_rewards) / len(player_rewards) / const_for_idk)
-        mean_enemy_reward = (mean_enemy_reward * ((const_for_idk - 1) / const_for_idk) +
-                              sum(enemy_rewards) / len(enemy_rewards) / const_for_idk)
-
-        const_for_idk = min(const_for_idk + 1, 1000)
 
         IterCounter.increment()
         for i in range(len(player_state)):
@@ -38,8 +33,19 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
         pl = player_trainer.train_step()
         el = enemy_trainer.train_step()
 
-        logs.append_pl(pl)
-        logs.append_el(el)
+        mean_player_reward = (mean_player_reward * alpha +
+                             (1 - alpha) * sum(player_rewards) / len(player_rewards))
+        mean_enemy_reward = (mean_enemy_reward * alpha +
+                            (1 - alpha) * sum(enemy_rewards) / len(enemy_rewards))
+
+        mean_player_loss = (mean_player_loss * alpha +
+                            (1 - alpha) * pl)
+        mean_enemy_loss = (mean_enemy_loss * alpha +
+                            (1 - alpha) * el)
+
+
+        logs.append_pl(mean_player_loss)
+        logs.append_el(mean_enemy_loss)
         logs.append_pr(mean_player_reward)
         logs.append_er(mean_enemy_reward)
 

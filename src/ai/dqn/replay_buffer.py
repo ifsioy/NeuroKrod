@@ -7,20 +7,29 @@ import numpy as np
 
 class ReplayBuffer:
     def __init__(self, capacity):
-        self.buffer = deque(maxlen=capacity)
+        self.buffer = []
+        self.capacity = capacity
+        self._ind = 0
 
     def push(self, state, action, reward, next_state, done):
-        self.buffer.append((
+        tmp = (
             copy.deepcopy(state),
             copy.deepcopy(action),
             copy.deepcopy(reward),
             copy.deepcopy(next_state),
             copy.deepcopy(done)
-        ))
+        )
+        if len(self.buffer) < self.capacity:
+            self.buffer.append(tmp)
+        else:
+            self.buffer[self._ind] = tmp
+            self._ind += 1
 
-    #TODO возможно стоит ускорить
+        if self._ind >= len(self.buffer):
+            self._ind = 0
+
     def sample(self, batch_size):
-        batch = random.sample(list(self.buffer), batch_size)
+        batch = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
         return (
             np.array(states),
