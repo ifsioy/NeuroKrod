@@ -11,7 +11,7 @@ from src.core.game_manager import GameManager
 from src.core.games.debug_game import DebugGame
 from src.core.games.game import Game
 from src.rendering.drawer import Drawer
-from src.utils.hyper_parameters import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_COUNT
+from src.utils.hyper_parameters import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_COUNT, WIN
 
 sys.setrecursionlimit(10**9)
 
@@ -36,8 +36,7 @@ train(
     game_manager,
     player_trainer,
     enemy_trainer,
-    save_interval=10000,
-    target_update_interval=1000)
+    save_interval=10000)
 
 # game = DebugGame()
 # # screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)

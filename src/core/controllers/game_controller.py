@@ -19,9 +19,10 @@ class GameController(BaseController):
     def handle(self, events: List[pygame.event.Event]):
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == self.keys['esc']:
+                key = getattr(event, 'key', None)
+                if key == self.keys['esc']:
                     self.game.is_running = False
-                if event.key == self.keys['g']:
+                if key == self.keys['g']:
                     if hasattr(self.game, 'drawer'):
                         if hasattr(self.game.drawer, 'is_disabled'):
                             self.game.drawer.is_disabled = not self.game.drawer.is_disabled

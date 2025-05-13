@@ -132,14 +132,14 @@ class CollisionSystem:
             player.x = hole.x
             player.y = hole.y
             pygame.event.post(HOLE_USED)
-        else:
-            print('OUT OF HOLES')
+        # else:
+        #     print('OUT OF HOLES')
 
     def _handle_player_gates(self, player: Player, gates: Gates):
         if not gates in self._collision_groups[Gates]:
             return
         if player.keys_collected == KEYS_NUMBER:
-            print('TRAVELING INTO THE DARK')
+            # print('TRAVELING INTO THE DARK')
             pygame.event.post(WIN)
 
     @staticmethod

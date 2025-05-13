@@ -1,7 +1,7 @@
 import copy
 from collections import deque
 import random
-
+import torch
 import numpy as np
 
 
@@ -13,16 +13,16 @@ class ReplayBuffer:
 
     def push(self, state, action, reward, next_state, done):
         tmp = (
-            copy.deepcopy(state),
-            copy.deepcopy(action),
-            copy.deepcopy(reward),
-            copy.deepcopy(next_state),
-            copy.deepcopy(done)
+            state,
+            action,
+            reward,
+            next_state,
+            done
         )
         if len(self.buffer) < self.capacity:
-            self.buffer.append(tmp)
+            self.buffer.append(copy.deepcopy(tmp))
         else:
-            self.buffer[self._ind] = tmp
+            self.buffer[self._ind] = copy.deepcopy(tmp)
             self._ind += 1
 
         if self._ind >= len(self.buffer):

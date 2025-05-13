@@ -7,6 +7,7 @@ import torch
 from src.ai.models.dqn_model import DQNWrapper
 from src.ai.utils.config import DQNConfig
 from src.ai.utils.iter_counter import IterCounter
+from src.ai.utils.logs import Logs
 from src.ai.utils.state_encoder import StateEncoder
 from src.core.controllers.base_controller import BaseController
 from src.core.grid.grid_manager import GridManager
@@ -26,6 +27,7 @@ class AIController(BaseController):
         self.frame_idx = 0
 
         self.velocity = [0, 0]
+        self.logs = Logs()
 
     @staticmethod
     def get_actions(states):
@@ -40,11 +42,10 @@ class AIController(BaseController):
         if self.is_training:
             eps = self.config.epsilon_final + (self.config.epsilon_start - self.config.epsilon_final) * \
                   math.exp(-IterCounter.counter / self.config.epsilon_decay)
-        if random.random() < 0.0002:
-            print(eps)
 
         self.frame_idx += 1
 
+        self.logs.append_eps(eps)
         if np.random.random() < eps:
             return np.random.randint(0, self.config.action_size)
 

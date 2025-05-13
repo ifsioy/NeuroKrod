@@ -104,6 +104,20 @@ class Game(BaseGame):
         for controller in self.controllers:
             controller.handle(self.events)
 
+    def update_events(self):
+        self.events = pygame.event.get()
+        st = set()
+        for event in self.events:
+            if not event.dict:
+                st.add(event.type)
+            else:
+                pygame.event.post(event)
+
+        for event in st:
+            pygame.event.post(pygame.event.Event(event))
+
+        self.events = pygame.event.get()
+
     def step(self, dt: float):
         for obj in self.game_objects:
             self.grid_manager.remove(obj)
@@ -126,7 +140,7 @@ class Game(BaseGame):
         for obj in self.game_objects:
             self.grid_manager.add(obj)
 
-        self.events = pygame.event.get()
+        self.update_events()
 
         self.draw(dt)
 

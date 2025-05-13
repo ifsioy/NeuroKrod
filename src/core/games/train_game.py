@@ -49,7 +49,7 @@ class TrainGame(Game):
 
         for player in self.players:
             objects_to_add.append(player)
-            self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
+            # self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
 
         self.enemies = list[Enemy]()
         self.enemies.append(Enemy(empty_cells[-1][1] * CELL_WIDTH, empty_cells[-1][0] * CELL_HEIGHT,

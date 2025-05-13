@@ -1,21 +1,22 @@
 import os
 
 from src.ai.dqn.dqn_trainer import DQNTrainer
+from src.ai.utils.config import DQNConfig
 from src.ai.utils.iter_counter import IterCounter
 from src.ai.utils.logs import Logs
 from src.core.game_manager import GameManager
 from src.utils.hyper_parameters import LOG_DRAW_PERIOD
 
 
-def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: DQNTrainer, save_interval=10000, target_update_interval=1000):
+def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: DQNTrainer, save_interval=10000, target_update_interval=DQNConfig.sync_target_frames):
     save_path = 'src/ai/models/saves'
     os.makedirs(save_path, exist_ok=True)
     mean_player_reward = 0
     mean_enemy_reward = 0
     mean_player_loss = 0
     mean_enemy_loss = 0
-    alpha = 0.99
     logs = Logs()
+    const_for_idk = 1
 
     while True:
         player_state, player_action, player_new_states, player_rewards, player_done, \
@@ -33,16 +34,17 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
         pl = player_trainer.train_step()
         el = enemy_trainer.train_step()
 
-        mean_player_reward = (mean_player_reward * alpha +
-                             (1 - alpha) * sum(player_rewards) / len(player_rewards))
-        mean_enemy_reward = (mean_enemy_reward * alpha +
-                            (1 - alpha) * sum(enemy_rewards) / len(enemy_rewards))
+        const_for_idk = min(const_for_idk + 1, 1000)
 
-        mean_player_loss = (mean_player_loss * alpha +
-                            (1 - alpha) * pl)
-        mean_enemy_loss = (mean_enemy_loss * alpha +
-                            (1 - alpha) * el)
+        mean_player_reward = (mean_player_reward * ((const_for_idk - 1) / const_for_idk) +
+                              sum(player_rewards) / len(player_rewards) / const_for_idk)
+        mean_enemy_reward = (mean_enemy_reward * ((const_for_idk - 1) / const_for_idk) +
+                             sum(enemy_rewards) / len(enemy_rewards) / const_for_idk)
 
+        mean_player_loss = (mean_player_loss * (const_for_idk - 1) / const_for_idk +
+                            pl / const_for_idk)
+        mean_enemy_loss = (mean_enemy_loss * (const_for_idk - 1) / const_for_idk +
+                            el / const_for_idk)
 
         logs.append_pl(mean_player_loss)
         logs.append_el(mean_enemy_loss)
@@ -54,8 +56,7 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
             enemy_trainer.model.update_target_network()
 
         if IterCounter.counter % 100 == 0:
-            print("YAY!")
-            print(f"Player mean reward: {mean_player_reward}, Enemy mean reward: {mean_enemy_reward}")
+            print('iters - ', IterCounter.counter)
 
         if IterCounter.counter % LOG_DRAW_PERIOD == 0:
             logs.draw_graphics()
