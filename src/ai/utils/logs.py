@@ -4,79 +4,100 @@ import matplotlib.pyplot as plt
 class Logs:
     _instance = None
 
-    enemy_rewards = []
-    player_rewards = []
-    enemy_loss = []
-    player_loss = []
-    eps = []
+    player_rewards = 'player_rewards'
+    enemy_rewards = 'enemy_rewards'
+    player_loss = 'player_loss'
+    enemy_loss = 'enemy_loss'
+    player_rewards_per_game = 'player_rewards_per_game'
+    enemy_rewards_per_game = 'enemy_rewards_per_game'
+    eps = 'eps'
+    game_duration = 'game_duration'
 
-    er_uc = 0
-    pr_uc = 0
-    el_uc = 0
-    pl_uc = 0
-    eps_uc = 0
+    data = {
+        'enemy_rewards': [],
+        'player_rewards': [],
+        'enemy_loss': [],
+        'player_loss': [],
+        'enemy_rewards_per_game': [],
+        'player_rewards_per_game': [],
+        'eps': [],
+        'game_duration': []
+    }
+
+    counters = {
+        'enemy_rewards': 0,
+        'player_rewards': 0,
+        'enemy_loss': 0,
+        'player_loss': 0,
+        'enemy_rewards_per_game': 0,
+        'player_rewards_per_game': 0,
+        'eps': 0,
+        'game_duration': 0
+    }
+
+    mean = {
+        'enemy_rewards': 0.,
+        'player_rewards': 0.,
+        'enemy_loss': 0.,
+        'player_loss': 0.,
+        'enemy_rewards_per_game': 0.,
+        'player_rewards_per_game': 0.,
+        'eps': 0.,
+        'game_duration': 0.
+    }
+
+    const_for_idk = 1
 
     def __new__(cls):
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def append_er(self, x: float):
-        self.er_uc += 1
-        if self.er_uc % LOG_PERIOD == 0:
-            self.er_uc = 0
-            self.enemy_rewards.append(x)
+    @staticmethod
+    def append(x: float, type: str):
+        if type not in Logs.data:
+            raise ValueError(f"Invalid log type: {type}")
 
-            if len(self.enemy_rewards) > LOG_SIZE:
-                self.enemy_rewards = self.enemy_rewards[-LOG_SIZE // 2:]
+        if type == 'enemy_rewards':
+            Logs.const_for_idk = min(Logs.const_for_idk + 1, 1000)
 
-    def append_pr(self, x: float):
-        self.pr_uc += 1
-        if self.pr_uc % LOG_PERIOD == 0:
-            self.pr_uc = 0
-            self.player_rewards.append(x)
+        Logs.counters[type] += 1
+        Logs.mean[type] = (Logs.mean[type] * (Logs.const_for_idk - 1) / Logs.const_for_idk +
+                            x / Logs.const_for_idk)
 
-            if len(self.player_rewards) > LOG_SIZE:
-                self.player_rewards = self.player_rewards[-LOG_SIZE // 2:]
+        if Logs.counters[type] % LOG_PERIOD == 0:
+            Logs.counters[type] = 0
+            if type == 'eps':
+                Logs.data[type].append(x)
+            else:
+                Logs.data[type].append(Logs.mean[type])
 
-    def append_el(self, x: float):
-        self.el_uc += 1
-        if self.el_uc % LOG_PERIOD == 0:
-            self.el_uc = 0
-            self.enemy_loss.append(x)
+            if len(Logs.data[type]) > LOG_SIZE:
+                Logs.data[type] = Logs.data[type][-LOG_SIZE // 2:]
 
-            if len(self.enemy_loss) > LOG_SIZE:
-                self.enemy_loss = self.enemy_loss[-LOG_SIZE // 2:]
 
-    def append_pl(self, x: float):
-        self.pl_uc += 1
-        if self.pl_uc % LOG_PERIOD == 0:
-            self.pl_uc = 0
-            self.player_loss.append(x)
-
-            if len(self.player_loss) > LOG_SIZE:
-                self.player_loss = self.player_loss[-LOG_SIZE // 2:]
-
-    def append_eps(self, x: float):
-        self.eps_uc += 1
-        if self.eps_uc % LOG_PERIOD == 0:
-            self.eps_uc = 0
-            self.eps.append(x)
-
-            if len(self.eps) > LOG_SIZE:
-                self.eps = self.eps[-LOG_SIZE // 2:]
-
-    def draw_graphics(self):
-        plt.plot(self.enemy_rewards, label='enemy_reward', color='red')
-        plt.plot(self.player_rewards, label='player_reward', color='orange')
+    @staticmethod
+    def draw_graphics():
+        plt.close('all')
+        plt.plot(Logs.data['enemy_rewards'], label='enemy_reward', color='red')
+        plt.plot(Logs.data['player_rewards'], label='player_reward', color='orange')
         plt.legend()
         plt.show()
 
-        plt.plot(self.enemy_loss, label='enemy_loss', color='blue')
-        plt.plot(self.player_loss, label='player_loss', color='purple')
+        plt.plot(Logs.data['player_rewards_per_game'], label='player_reward_per_game', color='green')
+        plt.plot(Logs.data['enemy_rewards_per_game'], label='enemy_reward_per_game', color='olive')
         plt.legend()
         plt.show()
 
-        plt.plot(self.eps, label='eps', color='blue')
+        plt.plot(Logs.data['enemy_loss'], label='enemy_loss', color='blue')
+        plt.plot(Logs.data['player_loss'], label='player_loss', color='purple')
+        plt.legend()
+        plt.show()
+
+        plt.plot(Logs.data['eps'], label='eps', color='blue')
+        plt.legend()
+        plt.show()
+
+        plt.plot(Logs.data['game_duration'], label='game_duration', color='red')
         plt.legend()
         plt.show()

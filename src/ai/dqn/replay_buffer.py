@@ -1,7 +1,5 @@
 import copy
-from collections import deque
 import random
-import torch
 import numpy as np
 
 
@@ -31,6 +29,7 @@ class ReplayBuffer:
     def sample(self, batch_size):
         batch = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
+
         return (
             np.array(states),
             np.array(actions),

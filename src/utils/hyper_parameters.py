@@ -55,21 +55,21 @@ HOLE_USED_EVENT     = pygame.USEREVENT + 4
 
 
 
-CAUGHT        = pygame.event.Event(pygame.USEREVENT + 1, message ="CAUGHT", value = 0)
-WIN           = pygame.event.Event(pygame.USEREVENT + 2, message ="WIN", value = 0)
-KEY_COLLECTED = pygame.event.Event(pygame.USEREVENT + 3, message ="KEY_COLLECTED", value = 0)
-HOLE_USED     = pygame.event.Event(pygame.USEREVENT + 4, message ="HOLE_USED", value = 0)
+CAUGHT        = pygame.event.Event(pygame.USEREVENT + 1)
+WIN           = pygame.event.Event(pygame.USEREVENT + 2)
+KEY_COLLECTED = pygame.event.Event(pygame.USEREVENT + 3)
+HOLE_USED     = pygame.event.Event(pygame.USEREVENT + 4)
 
 
 AREA_WIDTH = 7
 AREA_HEIGHT = 5
-GAME_DURATION = 30
-TRAINING_FPS = 5
+GAME_DURATION = 10
+TRAINING_FPS = 3
 GAME_COUNT = 64
 
 LOG_SIZE = 10000
 LOG_PERIOD = 50
-LOG_DRAW_PERIOD = 1000
+LOG_DRAW_PERIOD = 5000
 
 
 COLOR_WHITE = (255, 255, 255)
@@ -82,7 +82,7 @@ COLOR_BLUE = (0, 0, 255)
 COLOR_VIOLET = (191, 5, 247)
 
 FRAME_DURATION = 0.1
-UPS = 30
+UPS = 20
 UT = 1 / UPS
 
 IS_TRAINING = False

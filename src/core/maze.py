@@ -92,7 +92,7 @@ class Maze:
     def generate_maze(self):
         self.dfs(random.randint(1, self.width - 2), random.randint(1, self.height - 2))
         area = (self.width - 1) * (self.height - 1)
-        necessary_wall_number = area / 100 * WALL_PERCENT
+        necessary_wall_number = 0 #area / 100 * WALL_PERCENT
         # print("CIELI", necessary_wall_number)
 
         wall_pieces = []

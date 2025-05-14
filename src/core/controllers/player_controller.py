@@ -2,10 +2,11 @@ import math
 import pygame
 
 from src.core.controllers.base_controller import BaseController
+from src.game_objects.movable import Movable
 
 
 class PlayerController(BaseController):
-    def __init__(self, player, keys: dict = None):
+    def __init__(self, player: Movable, keys: dict = None):
         super().__init__()
         self.player = player
         self.keys = keys or {

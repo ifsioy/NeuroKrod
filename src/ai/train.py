@@ -11,12 +11,6 @@ from src.utils.hyper_parameters import LOG_DRAW_PERIOD
 def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: DQNTrainer, save_interval=10000, target_update_interval=DQNConfig.sync_target_frames):
     save_path = 'src/ai/models/saves'
     os.makedirs(save_path, exist_ok=True)
-    mean_player_reward = 0
-    mean_enemy_reward = 0
-    mean_player_loss = 0
-    mean_enemy_loss = 0
-    logs = Logs()
-    const_for_idk = 1
 
     while True:
         player_state, player_action, player_new_states, player_rewards, player_done, \
@@ -34,22 +28,13 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
         pl = player_trainer.train_step()
         el = enemy_trainer.train_step()
 
-        const_for_idk = min(const_for_idk + 1, 1000)
 
-        mean_player_reward = (mean_player_reward * ((const_for_idk - 1) / const_for_idk) +
-                              sum(player_rewards) / len(player_rewards) / const_for_idk)
-        mean_enemy_reward = (mean_enemy_reward * ((const_for_idk - 1) / const_for_idk) +
-                             sum(enemy_rewards) / len(enemy_rewards) / const_for_idk)
+        Logs.append(sum(player_rewards) / len(player_rewards), Logs.player_rewards)
+        Logs.append(sum(enemy_rewards) / len(enemy_rewards), Logs.enemy_rewards)
 
-        mean_player_loss = (mean_player_loss * (const_for_idk - 1) / const_for_idk +
-                            pl / const_for_idk)
-        mean_enemy_loss = (mean_enemy_loss * (const_for_idk - 1) / const_for_idk +
-                            el / const_for_idk)
+        Logs.append(pl, Logs.player_loss)
+        Logs.append(el, Logs.enemy_loss)
 
-        logs.append_pl(mean_player_loss)
-        logs.append_el(mean_enemy_loss)
-        logs.append_pr(mean_player_reward)
-        logs.append_er(mean_enemy_reward)
 
         if IterCounter.counter % target_update_interval == 0:
             player_trainer.model.update_target_network()
@@ -59,7 +44,7 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
             print('iters - ', IterCounter.counter)
 
         if IterCounter.counter % LOG_DRAW_PERIOD == 0:
-            logs.draw_graphics()
+            Logs.draw_graphics()
 
         if IterCounter.counter % save_interval == 0:
             player_trainer.model.save(os.path.join(save_path, f'player_model_{IterCounter.counter}.pth'))

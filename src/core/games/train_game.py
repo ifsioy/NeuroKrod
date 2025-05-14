@@ -74,8 +74,9 @@ class TrainGame(Game):
         self.state_encoder = StateEncoder(self.grid_manager)
 
         self.is_running = True
+        self.sum_rewards = [0, 0]
         self.start_time = datetime.now()
-        self.action = [0, 0]
+        self.actions = [0, 0]
 
     def get_player(self):
         return self.players[0]
@@ -84,13 +85,20 @@ class TrainGame(Game):
         return self.enemies[0]
 
     def get_rewards(self) -> tuple:
-        return self.reward_tracker.calculate_rewards(self.get_player(), self.get_enemy(), self.events)
+        rewards = self.reward_tracker.calculate_rewards(self.get_player(), self.get_enemy(), self.events)
+        if self.is_running:
+            self.sum_rewards[0] += rewards[0]
+            self.sum_rewards[1] += rewards[1]
+        return rewards
+
+    def get_sum_rewards(self):
+        return self.sum_rewards
 
     def get_state(self) -> tuple:
         return self.state_encoder.encode(self.get_player()), self.state_encoder.encode(self.get_enemy())
 
     def get_action(self) -> tuple:
-        return self.action[0], self.action[1]
+        return self.actions[0], self.actions[1]
 
     def handle_events(self):
         for controller in self.controllers:
@@ -98,6 +106,7 @@ class TrainGame(Game):
 
             if type(controller) == AIController:
                 if type(controller.obj) == Enemy:
-                    self.action[1] = action
+                    self.actions[1] = action
                 elif type(controller.obj) == Player:
-                    self.action[0] = action
+                    self.actions[0] = action
+

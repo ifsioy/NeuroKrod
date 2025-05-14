@@ -11,16 +11,10 @@ class DQN(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(DQN, self).__init__()
         self.net = nn.Sequential(
-            nn.Linear(input_dim, 256),
-            nn.ReLU(),
-            nn.BatchNorm1d(256),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.BatchNorm1d(128),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.BatchNorm1d(64),
-            nn.Linear(64, output_dim),
+            nn.Linear(input_dim, 16),
+            nn.LeakyReLU(),
+            # nn.BatchNorm1d(16),
+            nn.Linear(16, output_dim),
         )
 
     def forward(self, x):
@@ -32,6 +26,7 @@ class DQNWrapper:
         self.device = 'cpu'
         self.model = DQN(input_dim, action_space).to(self.device)
         self.target_model = DQN(input_dim, action_space).to(self.device)
+        self.target_model.load_state_dict(self.model.state_dict())
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.loss = nn.MSELoss()
 

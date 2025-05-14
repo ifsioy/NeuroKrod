@@ -45,7 +45,7 @@ class AIController(BaseController):
 
         self.frame_idx += 1
 
-        self.logs.append_eps(eps)
+        Logs.append(eps, Logs.eps)
         if np.random.random() < eps:
             return np.random.randint(0, self.config.action_size)
 
