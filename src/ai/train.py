@@ -13,26 +13,27 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
     os.makedirs(save_path, exist_ok=True)
 
     while True:
-        player_state, player_action, player_new_states, player_rewards, player_done, \
-        enemy_state, enemy_action, enemy_new_states, enemy_rewards, enemy_done = game_manager.parallel_step()
+        player_states, player_actions, player_new_states, player_rewards, player_dones, \
+        enemy_states, enemy_actions, enemy_new_states, enemy_rewards, enemy_dones = game_manager.parallel_step()
 
         IterCounter.increment()
-        for i in range(len(player_state)):
+        for i in range(len(player_states)):
             player_trainer.buffer.push(
-                player_state[i], player_action[i], player_rewards[i], player_new_states[i], player_done[i]
+                player_states[i], player_actions[i], player_rewards[i], player_new_states[i], player_dones[i]
             )
             enemy_trainer.buffer.push(
-                enemy_state[i], enemy_action[i], enemy_rewards[i], enemy_new_states[i], enemy_done[i]
+                enemy_states[i], enemy_actions[i], enemy_rewards[i], enemy_new_states[i], enemy_dones[i]
             )
 
-        pl = player_trainer.train_step()
-        el = enemy_trainer.train_step()
+            Logs.actions[enemy_actions[i]] += 1
 
+        # pl = player_trainer.train_step()
+        el = enemy_trainer.train_step()
 
         Logs.append(sum(player_rewards) / len(player_rewards), Logs.player_rewards)
         Logs.append(sum(enemy_rewards) / len(enemy_rewards), Logs.enemy_rewards)
 
-        Logs.append(pl, Logs.player_loss)
+        # Logs.append(pl, Logs.player_loss)
         Logs.append(el, Logs.enemy_loss)
 
 

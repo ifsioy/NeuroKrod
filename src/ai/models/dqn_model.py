@@ -13,7 +13,7 @@ class DQN(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(input_dim, 16),
             nn.LeakyReLU(),
-            # nn.BatchNorm1d(16),
+            nn.BatchNorm1d(16),
             nn.Linear(16, output_dim),
         )
 

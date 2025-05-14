@@ -1,3 +1,5 @@
+import numpy as np
+
 from src.utils.hyper_parameters import LOG_PERIOD, LOG_SIZE
 import matplotlib.pyplot as plt
 
@@ -45,6 +47,8 @@ class Logs:
         'eps': 0.,
         'game_duration': 0.
     }
+
+    actions = [0] * 8
 
     const_for_idk = 1
 
@@ -100,4 +104,23 @@ class Logs:
 
         plt.plot(Logs.data['game_duration'], label='game_duration', color='red')
         plt.legend()
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        for i in range(8):
+            bar = plt.bar(i * 20, Logs.actions[i], width=15, label=f'{i}' , color='blue', alpha=0.5)
+
+
+            plt.text(
+                i * 20,  # X-позиция
+                100,  # Y-позиция (смещение вверх)
+                f'{i} {Logs.actions[i]}',  # Текст
+                ha='center', va='bottom'  # Выравнивание
+            )
+
+        # Настройки
+        plt.title('actions')
+        plt.legend()
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+
         plt.show()

@@ -2,12 +2,15 @@ import copy
 import random
 import numpy as np
 
+from src.ai.utils.logs import Logs
+
 
 class ReplayBuffer:
     def __init__(self, capacity):
         self.buffer = []
         self.capacity = capacity
         self._ind = 0
+        self.actions = [0] * 8
 
     def push(self, state, action, reward, next_state, done):
         tmp = (
@@ -23,11 +26,20 @@ class ReplayBuffer:
             self.buffer[self._ind] = copy.deepcopy(tmp)
             self._ind += 1
 
-        if self._ind >= len(self.buffer):
+        if self._ind >= self.capacity:
             self._ind = 0
 
+        self.actions[action] += 1
+
+
     def sample(self, batch_size):
-        batch = random.sample(self.buffer, batch_size)
+        if self.actions != Logs.actions:
+            print('GOVNA')
+            print(self.actions)
+            print(Logs.actions)
+            print()
+
+        batch = random.choices(self.buffer, k=batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
 
         return (
