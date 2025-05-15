@@ -57,7 +57,6 @@ class TrainGame(Game):
 
         for enemy in self.enemies:
             objects_to_add.append(enemy)
-            self.controllers.append(AIController(enemy, self.grid_manager, enemy_model, config, True))
 
         self.camera = Camera(self.players[0])
         self.drawer = None
@@ -65,6 +64,14 @@ class TrainGame(Game):
         self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)
         for obj in objects_to_add:
             self.grid_manager.add(obj)
+
+        for player in self.players:
+            pass
+            # self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
+
+        for enemy in self.enemies:
+            self.controllers.append(AIController(enemy, self.grid_manager, enemy_model, config, True))
+
 
         for obj in objects_to_add:
             self.add_object(obj)

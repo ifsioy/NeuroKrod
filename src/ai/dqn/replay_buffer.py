@@ -20,6 +20,7 @@ class ReplayBuffer:
             next_state,
             done
         )
+
         if len(self.buffer) < self.capacity:
             self.buffer.append(copy.deepcopy(tmp))
         else:

@@ -1,3 +1,4 @@
+import copy
 import math
 import random
 
@@ -38,6 +39,7 @@ class AIController(BaseController):
 
     def get_action(self):
         state = self.encoder.encode(self.obj)
+        Logs.states.append(state)
         eps: float = 0
         if self.is_training:
             eps = self.config.epsilon_final + (self.config.epsilon_start - self.config.epsilon_final) * \
@@ -52,6 +54,7 @@ class AIController(BaseController):
         self.dqn.model.eval()
         state_t = torch.FloatTensor(state).to(self.dqn.device).unsqueeze(0)
         q_values = self.dqn.model(state_t)[0]
+
         return q_values.argmax().item()
 
     def handle(self, events):

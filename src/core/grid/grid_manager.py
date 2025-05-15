@@ -18,6 +18,14 @@ class GridManager:
             int((y + CELL_HEIGHT // 2) // CELL_HEIGHT)
         )
 
+    def on_object_added(self, data: dict):
+        obj = data['object']
+        self.add(obj)
+
+    def on_object_removed(self, data: dict):
+        obj = data['object']
+        self.remove(obj)
+
     def get_cell(self, x: int, y: int) -> Cell:
         if x < 0 or x >= self.width or y < 0 or y >= self.height:
             return Cell(x, y)

@@ -11,11 +11,11 @@ class RewardTracker:
 
     def calculate_rewards(self, player: Movable, enemy: Movable, events) -> tuple:
         player_reward = -0.05
-        enemy_reward = 0
+        enemy_reward = -0.1
 
         current_distance = self._calculate_distance(player, enemy)
         # if self.last_distance is not None:
-        #     enemy_reward += 0.1 * (self.last_distance - current_distance)
+        #     enemy_reward += 0.01 * (self.last_distance - current_distance)
 
         self.last_distance = current_distance
 

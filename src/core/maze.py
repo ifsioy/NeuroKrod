@@ -92,7 +92,7 @@ class Maze:
     def generate_maze(self):
         self.dfs(random.randint(1, self.width - 2), random.randint(1, self.height - 2))
         area = (self.width - 1) * (self.height - 1)
-        necessary_wall_number = 0 #area / 100 * WALL_PERCENT
+        necessary_wall_number = area / 100 * WALL_PERCENT
         # print("CIELI", necessary_wall_number)
 
         wall_pieces = []
@@ -130,11 +130,11 @@ class Maze:
             empty_cells.pop(0)
 
         gates = list()
-        for cell in empty_cells:
-            if self.maze[cell.y // CELL_HEIGHT - 1][cell.x // CELL_WIDTH] == '#':
-                gates.append(Gates(cell.x, cell.y - cell.height / 2 + GATES_HEIGHT / 2, GATES_WIDTH, GATES_HEIGHT))
-                empty_cells.remove(cell)
-                break
+        # for cell in empty_cells:
+        #     if self.maze[cell.y // CELL_HEIGHT - 1][cell.x // CELL_WIDTH] == '#':
+        #         gates.append(Gates(cell.x, cell.y - cell.height / 2 + GATES_HEIGHT / 2, GATES_WIDTH, GATES_HEIGHT))
+        #         empty_cells.remove(cell)
+        #         break
 
         game_objects.extend(walls)
         game_objects.extend(keys)

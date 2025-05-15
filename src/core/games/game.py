@@ -61,6 +61,9 @@ class Game(BaseGame):
         for obj in objects_to_add:
             self.grid_manager.add(obj)
 
+        self.event_system.subscribe(EventType.OBJECT_ADDED, self.grid_manager.on_object_added)
+        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.grid_manager.on_object_removed)
+
         for obj in objects_to_add:
             self.add_object(obj)
 
@@ -119,10 +122,12 @@ class Game(BaseGame):
         self.events = pygame.event.get()
 
     def step(self, dt: float):
-        for obj in self.game_objects:
-            self.grid_manager.remove(obj)
-
         self.handle_events()
+
+        for enemy in self.enemies:
+            self.grid_manager.remove(enemy)
+        for player in self.players:
+            self.grid_manager.remove(player)
 
         t = 0
         while t < dt:
@@ -137,8 +142,10 @@ class Game(BaseGame):
             for hole in self.maze.dig_holes(self.game_objects):
                 self.add_object(hole)
 
-        for obj in self.game_objects:
-            self.grid_manager.add(obj)
+        for enemy in self.enemies:
+            self.grid_manager.add(enemy)
+        for player in self.players:
+            self.grid_manager.add(player)
 
         self.update_events()
 

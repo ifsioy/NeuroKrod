@@ -58,6 +58,12 @@ class StateEncoder:
                 if type(obj) is Player:
                     px, py = obj.x, obj.y
                 elif type(obj) is Enemy:
+                    if type(target) is Enemy:
+                        if obj != target:
+                            print('ASSERT GOVNA')
+                            print(target)
+                            print(obj)
+                            print()
                     ex, ey = obj.x, obj.y
 
         state = [px, py, ex, ey]

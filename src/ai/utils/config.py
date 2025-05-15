@@ -6,9 +6,9 @@ class DQNConfig:
     input_dim: int = 4
     action_size: int = 8
     buffer_size: int = 100_000
-    batch_size: int = 64
-    gamma: float = 0.5
-    lr: float = 1e-5
+    batch_size: int = 128
+    gamma: float = 0.99
+    lr: float = 1e-3
     sync_target_frames: int = 100
     epsilon_start: float = 1.0
     epsilon_final: float = 0.01

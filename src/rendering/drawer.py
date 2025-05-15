@@ -69,7 +69,7 @@ class Drawer:
 
             time_str_sec = str(timedelta.total_seconds(datetime.now() - cell.last_player_visit))
 
-            text = f"{time_str_sec}"
+            text = f"{objects}"
 
             font = pygame.font.Font(None, 20)
             text_surface = font.render(text, True, (255, 255, 255))
