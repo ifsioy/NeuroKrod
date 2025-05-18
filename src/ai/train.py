@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 from src.ai.dqn.dqn_trainer import DQNTrainer
 from src.ai.utils.config import DQNConfig
@@ -13,8 +14,11 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
     os.makedirs(save_path, exist_ok=True)
 
     while True:
+        st = datetime.now()
         player_states, player_actions, player_new_states, player_rewards, player_dones, \
         enemy_states, enemy_actions, enemy_new_states, enemy_rewards, enemy_dones = game_manager.parallel_step()
+
+        # print('SECS',timedelta.total_seconds(datetime.now() - st))
 
         IterCounter.increment()
         for i in range(len(player_states)):

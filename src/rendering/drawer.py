@@ -1,11 +1,14 @@
 from datetime import timedelta, datetime
 
+import numpy as np
 import pygame
 
+from src.ai.utils.logs import Logs
+from src.ai.utils.state_encoder import StateEncoder
 from src.core.grid.grid_manager import GridManager
 from src.game_objects.game_object import GameObject
 from src.rendering.camera import Camera
-from src.utils.hyper_parameters import CELL_WIDTH, CELL_HEIGHT
+from src.utils.hyper_parameters import CELL_WIDTH, CELL_HEIGHT, CELL_GRID, AREA_WIDTH, AREA_HEIGHT
 
 
 class Drawer:
@@ -57,28 +60,50 @@ class Drawer:
         pygame.display.flip()
 
     def _draw_debug_info(self, grid_manager: GridManager):
+        encoder = StateEncoder(grid_manager)
+        encoder.encode(self.camera.target)
+        return
 
-        cells = grid_manager.get_cells_in_area(self.camera.target, 7, 5)
+        cells = grid_manager.get_cells_in_area(self.camera.target, AREA_WIDTH, AREA_HEIGHT)
 
-        for cell in cells:
-            objects = [t.__name__ for t in cell.objects.keys()]
-            time_str = str(cell.last_enemy_visit.hour) + ' '
-            time_str += str(cell.last_enemy_visit.minute) + ' '
-            time_str += str(cell.last_enemy_visit.second) + ' '
-            time_str += str(cell.last_enemy_visit.microsecond)
+        encoder = StateEncoder(grid_manager)
+        player_smell, enemy_smell, key, hole, wall, gate, player, enemy = encoder.encode(self.camera.target)
 
-            time_str_sec = str(timedelta.total_seconds(datetime.now() - cell.last_player_visit))
+        sx, sy = cells[0].x * CELL_WIDTH, cells[0].y * CELL_HEIGHT
 
-            text = f"{objects}"
+        w = AREA_WIDTH * CELL_GRID
+        h = AREA_WIDTH * CELL_GRID
 
-            font = pygame.font.Font(None, 20)
-            text_surface = font.render(text, True, (255, 255, 255))
-            text_rect = text_surface.get_rect()
-            obj = GameObject(CELL_WIDTH * cell.x + CELL_WIDTH // 2,
-                             CELL_HEIGHT * cell.y + CELL_HEIGHT // 2,
-                             CELL_WIDTH, CELL_HEIGHT)
+        for x in range(w):
+            for y in range(h):
+                text = f'{enemy[x * w + y]:.1f}'
+                obj = GameObject(sx + x * CELL_WIDTH // CELL_GRID + CELL_WIDTH // CELL_GRID // 2,
+                                 sy + y * CELL_HEIGHT // CELL_GRID + CELL_HEIGHT // CELL_GRID // 2,
+                                 CELL_WIDTH, CELL_HEIGHT)
+                pos = self.camera.world_to_screen(obj)
+                font = pygame.font.Font(None, 20)
+                text_surface = font.render(text, True, (255, 255, 255))
+                text_rect = text_surface.get_rect()
+                text_rect.center = (pos[0], pos[1])
+                self.screen.blit(text_surface, text_rect)
 
-            pos = self.camera.world_to_screen(obj)
-            text_rect.center = (pos[0], pos[1])
-
-            self.screen.blit(text_surface, text_rect)
+        # for cell in cells:
+        #     objects = [t.__name__ for t in cell.objects.keys()]
+        #
+        #     for x in range(CELL_GRID):
+        #         for y in range(CELL_GRID):
+        #             time_str_sec = str(timedelta.total_seconds(datetime.now() - cell.last_enemy_visit[x][y]))
+        #
+        #             text = f"{time_str_sec}"
+        #
+        #             font = pygame.font.Font(None, 20)
+        #             text_surface = font.render(text, True, (255, 255, 255))
+        #             text_rect = text_surface.get_rect()
+        #             obj = GameObject(CELL_WIDTH * cell.x + x * CELL_WIDTH // CELL_GRID + CELL_WIDTH // CELL_GRID // 2,
+        #                              CELL_HEIGHT * cell.y + y * CELL_HEIGHT // CELL_GRID + CELL_HEIGHT // CELL_GRID // 2,
+        #                              CELL_WIDTH, CELL_HEIGHT)
+        #
+        #             pos = self.camera.world_to_screen(obj)
+        #             text_rect.center = (pos[0], pos[1])
+        #
+        #             self.screen.blit(text_surface, text_rect)

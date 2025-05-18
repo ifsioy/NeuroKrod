@@ -39,7 +39,7 @@ class AIController(BaseController):
 
     def get_action(self):
         state = self.encoder.encode(self.obj)
-        Logs.states.append(state)
+        # print(state)
         eps: float = 0
         if self.is_training:
             eps = self.config.epsilon_final + (self.config.epsilon_start - self.config.epsilon_final) * \
@@ -70,7 +70,8 @@ class AIController(BaseController):
             [1, 0],
             [diagonal_speed, -diagonal_speed],
             [0, -1],
-            [-diagonal_speed, -diagonal_speed]
+            [-diagonal_speed, -diagonal_speed],
+            [0, 0]
         ]
 
         self.velocity = velocities[action]

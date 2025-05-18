@@ -48,9 +48,7 @@ class Logs:
         'game_duration': 0.
     }
 
-    states = []
-
-    actions = [0] * 8
+    actions = [0] * 9
 
     const_for_idk = 1
 
@@ -80,9 +78,6 @@ class Logs:
 
             if len(Logs.data[type]) > LOG_SIZE:
                 Logs.data[type] = Logs.data[type][-LOG_SIZE // 2:]
-
-            if len(Logs.states) > LOG_SIZE:
-                Logs.states = Logs.states[-LOG_SIZE // 2:]
 
 
     @staticmethod
@@ -117,25 +112,15 @@ class Logs:
 
 
             plt.text(
-                i * 20,  # X-позиция
-                100,  # Y-позиция (смещение вверх)
-                f'{i} {Logs.actions[i]}',  # Текст
-                ha='center', va='bottom'  # Выравнивание
+                i * 20,
+                100,
+                f'{i} {Logs.actions[i]}',
+                ha='center', va='bottom'
             )
 
-        # Настройки
         plt.title('actions')
         plt.legend()
         plt.grid(axis='y', linestyle='--', alpha=0.7)
 
         plt.show()
 
-        s = np.array(Logs.states)
-
-        plt.scatter(s[:,2], s[:,3],  color='m')
-        plt.scatter(s[:,0], s[:,1],  color='red')
-
-        plt.xlim(0, 1)
-        plt.ylim(0, 1)
-        plt.grid(True)
-        plt.show()

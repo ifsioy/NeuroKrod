@@ -58,7 +58,10 @@ class TrainGame(Game):
         for enemy in self.enemies:
             objects_to_add.append(enemy)
 
-        self.camera = Camera(self.players[0])
+        # self.camera = Camera(self.players[0])
+        self.camera = Camera(GameObject(MAZE_SIZE * CELL_WIDTH / 2,
+                                        MAZE_SIZE * CELL_HEIGHT / 2,
+                                        0, 0))
         self.drawer = None
 
         self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)

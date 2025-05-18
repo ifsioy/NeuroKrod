@@ -10,10 +10,16 @@ from src.ai.utils.config import DQNConfig
 from src.core.game_manager import GameManager
 from src.core.games.debug_game import DebugGame
 from src.core.games.game import Game
+from src.game_objects.game_object import GameObject
 from src.rendering.drawer import Drawer
 from src.utils.hyper_parameters import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_COUNT, WIN, CAUGHT
 
 sys.setrecursionlimit(10**9)
+
+
+# obj1 = GameObject(0, 0, 4, 4)
+# obj2 = GameObject(0, 0, 2, 2)
+# print(obj1.intersection_area(obj2))
 
 
 pygame.init()

@@ -46,11 +46,13 @@ class Maze:
         for step in order:
             self.dfs(x + step[0], y + step[1])
 
+        return True
+
     def find_empty_cells(self, game_objects: List[GameObject]):
         occupied_cells = set()
         for obj in game_objects:
-            column = obj.x // CELL_WIDTH
-            row = obj.y // CELL_HEIGHT
+            row = (obj.x + CELL_WIDTH / 2) // CELL_WIDTH
+            column = (obj.y + CELL_HEIGHT / 2) // CELL_HEIGHT
             if 0 <= row < self.width and 0 <= column < self.height:
                 occupied_cells.add((row, column))
 
@@ -78,9 +80,9 @@ class Maze:
         for i in range(len(empty_cells)):
             if hole_num >= HOLES_NUMBER:
                 break
-            cell = GameObject(empty_cells[i][1] * CELL_WIDTH, empty_cells[i][0] * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT)
-            hole = Hole(cell.x - cell.width / 2 + CELL_WIDTH / 3 * random.randint(0, 2) + CELL_WIDTH / 6,
-                        cell.y - cell.height / 2 + CELL_HEIGHT / 3 * random.randint(0, 2) + CELL_HEIGHT / 6,
+            cell_x, cell_y = empty_cells[i][0] * CELL_WIDTH, empty_cells[i][1] * CELL_HEIGHT
+            hole = Hole(cell_x - CELL_WIDTH / 2 + CELL_WIDTH / 3 * random.randint(0, 2) + CELL_WIDTH / 6,
+                        cell_y - CELL_HEIGHT / 2 + CELL_HEIGHT / 3 * random.randint(0, 2) + CELL_HEIGHT / 6,
                         HOLE_WIDTH, HOLE_HEIGHT)
 
             if not hole in game_objects:
@@ -130,11 +132,11 @@ class Maze:
             empty_cells.pop(0)
 
         gates = list()
-        # for cell in empty_cells:
-        #     if self.maze[cell.y // CELL_HEIGHT - 1][cell.x // CELL_WIDTH] == '#':
-        #         gates.append(Gates(cell.x, cell.y - cell.height / 2 + GATES_HEIGHT / 2, GATES_WIDTH, GATES_HEIGHT))
-        #         empty_cells.remove(cell)
-        #         break
+        for cell in empty_cells:
+            if self.maze[cell.y // CELL_HEIGHT - 1][cell.x // CELL_WIDTH] == '#':
+                gates.append(Gates(cell.x, cell.y - cell.height / 2 + GATES_HEIGHT / 2, GATES_WIDTH, GATES_HEIGHT))
+                empty_cells.remove(cell)
+                break
 
         game_objects.extend(walls)
         game_objects.extend(keys)

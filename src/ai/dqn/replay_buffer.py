@@ -1,6 +1,7 @@
 import copy
 import random
 import numpy as np
+import torch
 
 from src.ai.utils.logs import Logs
 
@@ -10,7 +11,6 @@ class ReplayBuffer:
         self.buffer = []
         self.capacity = capacity
         self._ind = 0
-        self.actions = [0] * 8
 
     def push(self, state, action, reward, next_state, done):
         tmp = (
@@ -30,25 +30,17 @@ class ReplayBuffer:
         if self._ind >= self.capacity:
             self._ind = 0
 
-        self.actions[action] += 1
 
-
-    def sample(self, batch_size):
-        if self.actions != Logs.actions:
-            print('GOVNA')
-            print(self.actions)
-            print(Logs.actions)
-            print()
-
+    def sample(self, batch_size, device = 'cpu'):
         batch = random.choices(self.buffer, k=batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
 
         return (
-            np.array(states),
-            np.array(actions),
-            np.array(rewards, dtype=np.float32),
-            np.array(next_states),
-            np.array(dones, dtype=np.uint8)
+            torch.tensor(np.array(states), dtype=torch.float32, device=device),
+            torch.tensor(np.array(actions), dtype=torch.int64, device=device),
+            torch.tensor(np.array(rewards, dtype=np.float32), dtype=torch.float32, device=device),
+            torch.tensor(np.array(next_states), dtype=torch.float32, device=device),
+            torch.tensor(np.array(dones, dtype=np.uint8), dtype=torch.float32, device=device),
         )
 
     def __len__(self):

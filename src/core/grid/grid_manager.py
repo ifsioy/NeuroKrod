@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from typing import List
 
 from src.core.grid.cell import Cell
@@ -49,6 +50,10 @@ class GridManager:
 
         return offset_x, offset_y
 
+    def get_all_cells(self):
+        return [self.get_cell(x, y)
+                for x in range(self.width)
+                for y in range(self.height)]
 
     def get_cells_in_area(self, obj: GameObject, width: int, height: int) -> List[Cell]:
         centre_x, centre_y = self.world_to_grid(obj.x, obj.y)
