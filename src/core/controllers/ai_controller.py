@@ -70,8 +70,7 @@ class AIController(BaseController):
             [1, 0],
             [diagonal_speed, -diagonal_speed],
             [0, -1],
-            [-diagonal_speed, -diagonal_speed],
-            [0, 0]
+            [-diagonal_speed, -diagonal_speed]
         ]
 
         self.velocity = velocities[action]

@@ -11,13 +11,13 @@ from src.utils.hyper_parameters import GAME_DURATION, SCREEN_WIDTH, SCREEN_HEIGH
 
 
 class GameManager:
-    def __init__(self, num_games: int, config: DQNConfig, player_model: DQNWrapper, enemy_model: DQNWrapper):
+    def __init__(self, num_games: int, config: DQNConfig, player_model: DQNWrapper, enemy_model: DQNWrapper, screen):
         self.num_games = num_games
         self.config = config
         self.player_model = player_model
         self.enemy_model = enemy_model
         self.games = [TrainGame(player_model, enemy_model, config) for _ in range(num_games)]
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = screen
         drawer = Drawer(self.screen)
         self.games[0].set_drawer(drawer)
         self.dt = 1 / TRAINING_FPS

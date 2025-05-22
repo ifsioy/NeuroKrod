@@ -26,18 +26,23 @@ class StateEncoder:
         cells = self.grid_manager.get_cells_in_area(target, AREA_WIDTH, AREA_HEIGHT)
         sx = cells[0].x
         sy = cells[0].y
+        # sx = 1
+        # sy = 1
 
         grid_w = AREA_WIDTH * CELL_GRID
         grid_h = AREA_HEIGHT * CELL_GRID
 
-        player_smell = [0] * (grid_w * grid_h)
-        enemy_smell = [0] * (grid_w * grid_h)
-        key = [0] * (grid_w * grid_h)
-        hole = [0] * (grid_w * grid_h)
-        wall = [0] * (grid_w * grid_h)
-        gate = [0] * (grid_w * grid_h)
-        player = [0] * (grid_w * grid_h)
-        enemy = [0] * (grid_w * grid_h)
+        pos_x = [0.] * (grid_w * grid_h)
+        pos_y = [0.] * (grid_w * grid_h)
+
+        player_smell = [0.] * (grid_w * grid_h)
+        enemy_smell = [0.] * (grid_w * grid_h)
+        key = [0.] * (grid_w * grid_h)
+        hole = [0.] * (grid_w * grid_h)
+        wall = [0.] * (grid_w * grid_h)
+        gate = [0.] * (grid_w * grid_h)
+        player = [0.] * (grid_w * grid_h)
+        enemy = [0.] * (grid_w * grid_h)
 
         cur_time = datetime.now()
         for x in range(grid_w):
@@ -45,6 +50,10 @@ class StateEncoder:
                 cell_x = sx + x // CELL_GRID
                 cell_y = sy + y // CELL_GRID
                 idx = x * grid_h + y
+
+                pos_x[idx] = x / grid_w
+                pos_y[idx] = y / grid_h
+
                 player_smell[idx] = SMELL_CONST ** timedelta.total_seconds(
                     cur_time - self.grid_manager.get_cell(cell_x, cell_y).last_player_visit[x % CELL_GRID][
                         y % CELL_GRID]
@@ -102,7 +111,7 @@ class StateEncoder:
                         elif type(obj) is Enemy:
                             enemy[idx] += area
 
-        # return player_smell, enemy_smell, key, hole, wall, gate, player, enemy
+        # return pos_x, pos_y, key, hole, wall, gate, player, enemy
 
         state = player_smell + enemy_smell + key + hole + wall + gate + player + enemy
         return torch.tensor(state, dtype=torch.float32).reshape(8, AREA_WIDTH * CELL_GRID, AREA_HEIGHT * CELL_GRID)

@@ -41,19 +41,19 @@ class DQN(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(DQN, self).__init__()
 
-        block_num_layers = [2, 2, 2]
-        blocks_num_channels = [input_dim[0], 16, 32, 64]
-        use_max_pool = [True, True, True]
-        dropouts = [0.05, 0.05, 0.05]
-        fc_dropouts = [0.05, 0.05]
+        block_num_layers = [2, 2]
+        blocks_num_channels = [input_dim[0], 32, 32, 32]
+        use_max_pool = [True, True]
+        dropouts = [0, 0]
+        fc_dropouts = [0, 0, 0]
 
-        fc_sizes = [64, 32, output_dim]
+        fc_sizes = [32 * 8 * 8, 256, 128, output_dim]
 
         self.net = nn.Sequential(
             *[
                 Block(blocks_num_channels[i], blocks_num_channels[i + 1], block_num_layers[i], dropouts[i], use_max_pool[i]) for i in range(len(block_num_layers))
             ],
-            nn.AdaptiveAvgPool2d(1),
+            # nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
             nn.Linear(fc_sizes[0], fc_sizes[1]),
             *[
@@ -64,35 +64,10 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-class CNNModel(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        #(1, 28, 28)
-        super(CNNModel, self).__init__()
-        self.net = nn.Sequential(*[
-            nn.Conv2d(input_dim[0], 16, kernel_size=3, padding='same'),
-            nn.MaxPool2d(2),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=3, padding='same'),
-            nn.MaxPool2d(2),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, padding='same'),
-            nn.MaxPool2d(2),
-            nn.ReLU(),
-            nn.Flatten(),
-            nn.Linear(64 * 3 * 3, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, output_dim)
-        ])
-
-    def forward(self, x):
-        return self.net(x)
-
 class DQNWrapper:
     def __init__(self, input_dim, action_space, lr = DQNConfig.lr):
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.device = 'cpu'
+        self.device = 'cuda'
         self.model = DQN(input_dim, action_space).to(self.device)
         self.target_model = DQN(input_dim, action_space).to(self.device)
         self.target_model.load_state_dict(self.model.state_dict())
@@ -110,7 +85,7 @@ class DQNWrapper:
             self.model.load_state_dict(torch.load(path))
 
 
-model = DQN((8, 21, 21), 9)
-inp = torch.randn(64, 8, 21, 21)
+model = DQN((8, 33, 33), 9)
+inp = torch.randn(64, 8, 33, 33)
 out = model(inp)
 print(out.shape)

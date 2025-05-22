@@ -1,4 +1,5 @@
 import copy
+import random
 from datetime import datetime
 
 import pygame
@@ -20,6 +21,7 @@ from src.core.maze import Maze
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
 from src.game_objects.player import Player
+from src.game_objects.wall import Wall
 from src.rendering.camera import Camera
 from src.utils.hyper_parameters import MAZE_SIZE, CELL_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, CELL_HEIGHT, PLAYER_WIDTH, \
     ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED
@@ -43,16 +45,17 @@ class TrainGame(Game):
         self.controllers.append(GameController(self))
 
         empty_cells = self.maze.find_empty_cells(objects_to_add)
+        random.shuffle(empty_cells)
         self.players = list[Player]()
-        self.players.append(Player(empty_cells[0][1] * CELL_WIDTH, empty_cells[0][0] * CELL_HEIGHT,
+        self.players.append(Player(empty_cells[0][0] * CELL_WIDTH, empty_cells[0][1] * CELL_HEIGHT,
                                    PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
 
         for player in self.players:
             objects_to_add.append(player)
-            # self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
+
 
         self.enemies = list[Enemy]()
-        self.enemies.append(Enemy(empty_cells[-1][1] * CELL_WIDTH, empty_cells[-1][0] * CELL_HEIGHT,
+        self.enemies.append(Enemy(empty_cells[-1][0] * CELL_WIDTH, empty_cells[-1][1] * CELL_HEIGHT,
                                   ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED))
 
         for enemy in self.enemies:
@@ -70,7 +73,7 @@ class TrainGame(Game):
 
         for player in self.players:
             pass
-            # self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
+            self.controllers.append(AIController(player, self.grid_manager, player_model, config, True))
 
         for enemy in self.enemies:
             self.controllers.append(AIController(enemy, self.grid_manager, enemy_model, config, True))

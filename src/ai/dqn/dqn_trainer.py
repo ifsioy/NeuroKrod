@@ -21,7 +21,7 @@ class DQNTrainer:
         if len(self.buffer) < self.config.batch_size:
             return 0
 
-        states, actions, rewards, next_states, dones = self.buffer.sample(self.config.batch_size)
+        states, actions, rewards, next_states, dones = self.buffer.sample(self.config.batch_size, self.model.device)
 
         self.model.target_model.eval()
         self.model.model.train()

@@ -1,5 +1,4 @@
-from src.rendering.components.render_component import RenderComponent
-from src.rendering.components.shape_component import ShapeComponent
+from src.rendering.components.frame_component import FrameComponent
 from src.utils.hyper_parameters import COLOR_WHITE
 
 
@@ -9,14 +8,14 @@ class GameObject:
         self.y = y
         self.width = width
         self.height = height
-        self.render_component = ShapeComponent(COLOR_WHITE)
+        self.render_component = FrameComponent(COLOR_WHITE)
         self.is_destroyed = False
 
     def destroy(self):
         self.is_destroyed = True
 
     def physics_update(self, dt: float):
-        pass
+        self.render_component.update(dt)
 
     def square(self):
         return self.width * self.height

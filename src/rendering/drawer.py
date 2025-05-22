@@ -47,7 +47,7 @@ class Drawer:
         if self.is_disabled:
             return
         self.camera.update(dt)
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((100, 100, 100))
 
         for component_type in sorted(self.render_components, key = lambda x: x.Z_ORDER):
             for obj in self.render_components[component_type]:
@@ -65,18 +65,19 @@ class Drawer:
         return
 
         cells = grid_manager.get_cells_in_area(self.camera.target, AREA_WIDTH, AREA_HEIGHT)
+        # sx, sy = cells[0].x * CELL_WIDTH, cells[0].y * CELL_HEIGHT
+        sx, sy = 1 * CELL_WIDTH, 1 * CELL_HEIGHT
 
         encoder = StateEncoder(grid_manager)
         player_smell, enemy_smell, key, hole, wall, gate, player, enemy = encoder.encode(self.camera.target)
 
-        sx, sy = cells[0].x * CELL_WIDTH, cells[0].y * CELL_HEIGHT
 
         w = AREA_WIDTH * CELL_GRID
         h = AREA_WIDTH * CELL_GRID
 
         for x in range(w):
             for y in range(h):
-                text = f'{enemy[x * w + y]:.1f}'
+                text = f'{enemy_smell[x * w + y]:.1f}'
                 obj = GameObject(sx + x * CELL_WIDTH // CELL_GRID + CELL_WIDTH // CELL_GRID // 2,
                                  sy + y * CELL_HEIGHT // CELL_GRID + CELL_HEIGHT // CELL_GRID // 2,
                                  CELL_WIDTH, CELL_HEIGHT)

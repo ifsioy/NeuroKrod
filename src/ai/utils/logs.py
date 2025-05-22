@@ -48,7 +48,9 @@ class Logs:
         'game_duration': 0.
     }
 
-    actions = [0] * 9
+    actions = [0] * 8
+
+    max_rast = 0
 
     const_for_idk = 1
 

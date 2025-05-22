@@ -131,6 +131,7 @@ class Maze:
                                  KEY_WIDTH, KEY_HEIGHT))
             empty_cells.pop(0)
 
+        random.shuffle(empty_cells)
         gates = list()
         for cell in empty_cells:
             if self.maze[cell.y // CELL_HEIGHT - 1][cell.x // CELL_WIDTH] == '#':
@@ -138,6 +139,7 @@ class Maze:
                 empty_cells.remove(cell)
                 break
 
+        random.shuffle(empty_cells)
         game_objects.extend(walls)
         game_objects.extend(keys)
         game_objects.extend(gates)

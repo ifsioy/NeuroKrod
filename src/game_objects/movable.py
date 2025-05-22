@@ -13,6 +13,7 @@ class Movable(GameObject):
         self.velocity = new_velocity
 
     def physics_update(self, dt: float):
+        super(Movable, self).physics_update(dt)
         self.prev_x = self.x
         self.prev_y = self.y
 

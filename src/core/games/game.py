@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
+import random
 
-import pygame
-
-from src.ai.rewards import RewardTracker
-from src.ai.utils.state_encoder import StateEncoder
 from src.core.grid.grid_manager import GridManager
 from src.core.collision_system import CollisionSystem
 from src.core.controllers.base_controller import BaseController
@@ -38,8 +35,9 @@ class Game(BaseGame):
         self.controllers.append(GameController(self))
 
         empty_cells = self.maze.find_empty_cells(objects_to_add)
+        random.shuffle(empty_cells)
         self.players = list[Player]()
-        self.players.append(Player(empty_cells[0][1] * CELL_WIDTH, empty_cells[0][0] * CELL_HEIGHT,
+        self.players.append(Player(empty_cells[0][0] * CELL_WIDTH, empty_cells[0][1] * CELL_HEIGHT,
                               PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
 
         for player in self.players:
@@ -47,7 +45,7 @@ class Game(BaseGame):
             self.controllers.append(PlayerController(player))
 
         self.enemies = list[Enemy]()
-        self.enemies.append(Enemy(empty_cells[-1][1] * CELL_WIDTH, empty_cells[-1][0] * CELL_HEIGHT,
+        self.enemies.append(Enemy(empty_cells[-1][0] * CELL_WIDTH, empty_cells[-1][1] * CELL_HEIGHT,
                              ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED))
 
         for enemy in self.enemies:
@@ -101,6 +99,7 @@ class Game(BaseGame):
     def draw(self, dt):
         if self.drawer is None:
             return
+
         self.drawer.draw_frame(dt)
 
     def handle_events(self):

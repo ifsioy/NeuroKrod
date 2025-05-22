@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime, timedelta
 
 from src.ai.dqn.dqn_trainer import DQNTrainer
@@ -31,13 +32,13 @@ def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: 
 
             Logs.actions[enemy_actions[i]] += 1
 
-        # pl = player_trainer.train_step()
+        pl = player_trainer.train_step()
         el = enemy_trainer.train_step()
 
         Logs.append(sum(player_rewards) / len(player_rewards), Logs.player_rewards)
         Logs.append(sum(enemy_rewards) / len(enemy_rewards), Logs.enemy_rewards)
 
-        # Logs.append(pl, Logs.player_loss)
+        Logs.append(pl, Logs.player_loss)
         Logs.append(el, Logs.enemy_loss)
 
 
