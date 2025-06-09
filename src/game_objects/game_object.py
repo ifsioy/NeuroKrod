@@ -1,5 +1,5 @@
 from src.rendering.components.frame_component import FrameComponent
-from src.utils.hyper_parameters import COLOR_WHITE
+from src.utils.constants import COLOR_WHITE
 
 
 class GameObject:
@@ -35,3 +35,16 @@ class GameObject:
         overlap_y = max(0, min(bottom_a, bottom_b) - max(top_a, top_b))
 
         return overlap_x * overlap_y
+
+    def to_dict(self):
+        return {
+            "class": self.__class__.__name__,
+            "x": self.x,
+            "y": self.y,
+            "width": self.width,
+            "height": self.height,
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(d['x'], d['y'], d['width'], d['height'])

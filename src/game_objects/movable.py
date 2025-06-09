@@ -19,3 +19,17 @@ class Movable(GameObject):
 
         self.x += self.velocity[0] * dt * self.speed
         self.y += self.velocity[1] * dt * self.speed
+
+    def to_dict(self):
+        return {
+            "class": self.__class__.__name__,
+            "x": self.x,
+            "y": self.y,
+            "width": self.width,
+            "height": self.height,
+            "speed": self.speed,
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(d['x'], d['y'], d['width'], d['height'], d['speed'])

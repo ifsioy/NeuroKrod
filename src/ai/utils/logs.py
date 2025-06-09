@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.utils.hyper_parameters import LOG_PERIOD, LOG_SIZE
+from src.utils.constants import LOG_PERIOD, LOG_SIZE
 import matplotlib.pyplot as plt
 
 class Logs:
@@ -14,6 +14,12 @@ class Logs:
     enemy_rewards_per_game = 'enemy_rewards_per_game'
     eps = 'eps'
     game_duration = 'game_duration'
+    mean_target = 'mean_target'
+    mean_current = 'mean_current'
+    mean_states = 'mean_states'
+
+    mean_rew = 'mean_rew'
+    mean_next = 'mean_next'
 
     data = {
         'enemy_rewards': [],
@@ -23,7 +29,13 @@ class Logs:
         'enemy_rewards_per_game': [],
         'player_rewards_per_game': [],
         'eps': [],
-        'game_duration': []
+        'game_duration': [],
+        'mean_target': [],
+        'mean_current': [],
+        'mean_states': [],
+
+        'mean_rew': [],
+        'mean_next': [],
     }
 
     counters = {
@@ -34,7 +46,13 @@ class Logs:
         'enemy_rewards_per_game': 0,
         'player_rewards_per_game': 0,
         'eps': 0,
-        'game_duration': 0
+        'game_duration': 0,
+        'mean_target': 0,
+        'mean_current': 0,
+        'mean_states': 0,
+
+        'mean_rew': 0,
+        'mean_next': 0,
     }
 
     mean = {
@@ -45,7 +63,13 @@ class Logs:
         'enemy_rewards_per_game': 0.,
         'player_rewards_per_game': 0.,
         'eps': 0.,
-        'game_duration': 0.
+        'game_duration': 0.,
+        'mean_target': 0.,
+        'mean_current': 0.,
+        'mean_states': 0.,
+
+        'mean_rew': 0.,
+        'mean_next': 0.,
     }
 
     actions = [0] * 8
@@ -64,7 +88,8 @@ class Logs:
         if type not in Logs.data:
             raise ValueError(f"Invalid log type: {type}")
 
-        if type == 'enemy_rewards':
+
+        if type == Logs.player_rewards:
             Logs.const_for_idk = min(Logs.const_for_idk + 1, 1000)
 
         Logs.counters[type] += 1
@@ -96,6 +121,8 @@ class Logs:
         plt.show()
 
         plt.plot(Logs.data['enemy_loss'], label='enemy_loss', color='blue')
+        plt.legend()
+        plt.show()
         plt.plot(Logs.data['player_loss'], label='player_loss', color='purple')
         plt.legend()
         plt.show()
@@ -105,6 +132,20 @@ class Logs:
         plt.show()
 
         plt.plot(Logs.data['game_duration'], label='game_duration', color='red')
+        plt.legend()
+        plt.show()
+
+        plt.plot(Logs.data['mean_target'], label='mean_target', color='blue')
+        plt.plot(Logs.data['mean_current'], label='mean_current', color='green')
+        plt.legend()
+        plt.show()
+
+        plt.plot(Logs.data['mean_states'], label='mean_states', color='pink')
+        plt.legend()
+        plt.show()
+
+        plt.plot(Logs.data['mean_rew'], label='mean_rew', color='purple')
+        plt.plot(Logs.data['mean_next'], label='mean_next', color='blue')
         plt.legend()
         plt.show()
 

@@ -4,7 +4,7 @@ from typing import Dict, Type
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
 from src.game_objects.player import Player
-from src.utils.hyper_parameters import CELL_GRID, CELL_WIDTH, CELL_HEIGHT
+from src.utils.constants import CELL_GRID, CELL_WIDTH, CELL_HEIGHT
 
 
 class Cell:
@@ -15,6 +15,7 @@ class Cell:
         smell = datetime.now() - timedelta(hours=5)
         self.last_player_visit = [[smell for _ in range(CELL_GRID)] for _ in range(CELL_GRID)]
         self.last_enemy_visit = [[smell for _ in range(CELL_GRID)] for _ in range(CELL_GRID)]
+        self.dir = None
 
     def add_object(self, obj: GameObject) -> bool:
         obj_type = type(obj)

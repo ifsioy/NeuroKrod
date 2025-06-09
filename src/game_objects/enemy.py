@@ -1,14 +1,13 @@
 from src.game_objects.movable import Movable
 from src.rendering.components.animated_sprite_component import AnimatedSpriteComponent
-from src.rendering.components.shape_component import ShapeComponent
-from src.rendering.sprite_loader import SpriteLoader
-from src.utils.hyper_parameters import COLOR_VIOLET, ASSETS_DIR
+from src.utils.animations import ENEMY_RUN_ANIMATION
+from src.utils.constants import ENEMY_SPEED
 
 
 class Enemy(Movable):
-    def __init__(self, x, y, width, height, speed):
+    def __init__(self, x, y, width, height, speed = ENEMY_SPEED):
         super(Enemy, self).__init__(x, y, width, height, speed)
-        run = SpriteLoader.load_animation(ASSETS_DIR / 'enemy', width, height)
+        run = ENEMY_RUN_ANIMATION
         self.render_component = AnimatedSpriteComponent({
             'idle': run,
             'run': run

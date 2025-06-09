@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pygame
 
-from src.utils.hyper_parameters import FRAME_DURATION
+from src.utils.constants import FRAME_DURATION
 
 
 @dataclass

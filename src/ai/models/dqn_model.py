@@ -1,3 +1,4 @@
+import math
 import os
 
 import torch
@@ -37,12 +38,12 @@ class Block(nn.Module):
         return self.batch_norm(self.dropout(self.pooling(self.activation(self.skip_connection(x) + self.layers(x)))))
 
 class DQN(nn.Module):
-    #8, 21, 21
+    #14, 33, 33
     def __init__(self, input_dim, output_dim):
         super(DQN, self).__init__()
 
         block_num_layers = [2, 2]
-        blocks_num_channels = [input_dim[0], 32, 32, 32]
+        blocks_num_channels = [input_dim[0], 32, 32]
         use_max_pool = [True, True]
         dropouts = [0, 0]
         fc_dropouts = [0, 0, 0]
@@ -64,14 +65,34 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+class LinearModel(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(LinearModel, self).__init__()
+        self.net = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(math.prod(input_dim), 256),
+            nn.ReLU(),
+            nn.BatchNorm1d(256),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Linear(64, output_dim),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
 class DQNWrapper:
     def __init__(self, input_dim, action_space, lr = DQNConfig.lr):
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.device = 'cuda'
-        self.model = DQN(input_dim, action_space).to(self.device)
-        self.target_model = DQN(input_dim, action_space).to(self.device)
+        self.model = LinearModel(input_dim, action_space).to(self.device)
+        self.target_model = LinearModel(input_dim, action_space).to(self.device)
         self.target_model.load_state_dict(self.model.state_dict())
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=1e-5)
         self.loss = nn.MSELoss()
 
     def update_target_network(self):
@@ -82,7 +103,9 @@ class DQNWrapper:
 
     def load(self, path):
         if os.path.exists(path):
+            print('Loading model from {}'.format(path))
             self.model.load_state_dict(torch.load(path))
+            self.target_model.load_state_dict(torch.load(path))
 
 
 model = DQN((8, 33, 33), 9)

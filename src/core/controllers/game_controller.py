@@ -4,7 +4,7 @@ import pygame
 
 from src.core.controllers.base_controller import BaseController
 from src.core.games.base_game import BaseGame
-from src.utils.hyper_parameters import CAUGHT_EVENT, WIN_EVENT
+from src.utils.constants import CAUGHT_EVENT, WIN_EVENT, ROOT_DIR
 
 
 class GameController(BaseController):
@@ -13,7 +13,9 @@ class GameController(BaseController):
         self.game: BaseGame = game
         self.keys = keys or {
             'esc': pygame.K_ESCAPE,
-            'g' : pygame.K_g
+            'g' : pygame.K_g,
+            'p' : pygame.K_p,
+            'o' : pygame.K_o,
         }
 
     def handle(self, events: List[pygame.event.Event]):
@@ -26,7 +28,10 @@ class GameController(BaseController):
                     if hasattr(self.game, 'drawer'):
                         if hasattr(self.game.drawer, 'is_disabled'):
                             self.game.drawer.is_disabled = not self.game.drawer.is_disabled
-
+                if key == self.keys['p']:
+                    self.game.save()
+                if key == self.keys['o']:
+                    self.game.load()
 
             if event.type == pygame.QUIT:
                 self.game.is_running = False
@@ -35,4 +40,5 @@ class GameController(BaseController):
                 self.game.is_running = False
 
             if event.type == WIN_EVENT:
+                self.game.win = True
                 self.game.is_running = False

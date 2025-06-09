@@ -4,7 +4,7 @@ import pygame
 
 from src.game_objects.game_object import GameObject
 from src.rendering.ray import Ray
-from src.utils.hyper_parameters import RAYS_NUMBER, W_SHIFT, BASE_SIZE, H_SHIFT, CELL_WIDTH
+from src.utils.constants import RAYS_NUMBER, W_SHIFT, BASE_SIZE, H_SHIFT, CELL_WIDTH
 
 import math
 

@@ -3,7 +3,7 @@ from typing import List
 
 from src.core.grid.cell import Cell
 from src.game_objects.game_object import GameObject
-from src.utils.hyper_parameters import CELL_WIDTH, CELL_HEIGHT
+from src.utils.constants import CELL_WIDTH, CELL_HEIGHT
 
 
 class GridManager:

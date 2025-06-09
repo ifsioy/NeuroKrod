@@ -6,12 +6,12 @@ from src.game_objects.gates import Gates
 from src.game_objects.hole import Hole
 from src.game_objects.key import Key
 from src.game_objects.wall import Wall
-from src.utils.hyper_parameters import WALL_PERCENT, CELL_WIDTH, CELL_HEIGHT, HOLE_WIDTH, HOLE_HEIGHT, HOLES_NUMBER, \
+from src.utils.constants import WALL_PERCENT, CELL_WIDTH, CELL_HEIGHT, HOLE_WIDTH, HOLE_HEIGHT, HOLES_NUMBER, \
     KEYS_NUMBER, KEY_WIDTH, KEY_HEIGHT, GATES_HEIGHT, GATES_WIDTH
 
 
 class Maze:
-    def __init__(self, size):
+    def __init__(self, size, training = False):
         self.width = size
         self.height = size
         self.maze = [['#' for _ in range(self.width)] for _ in range(self.height)]

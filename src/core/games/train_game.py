@@ -1,8 +1,6 @@
-import copy
 import random
 from datetime import datetime
 
-import pygame
 
 from src.ai.models.dqn_model import DQNWrapper
 from src.ai.rewards import RewardTracker
@@ -13,7 +11,6 @@ from src.core.controllers.ai_controller import AIController
 from src.core.controllers.base_controller import BaseController
 from src.core.controllers.game_controller import GameController
 from src.core.controllers.player_controller import PlayerController
-from src.core.controllers.rand_controller import RandController
 from src.core.event_system import EventSystem, EventType
 from src.core.games.game import Game
 from src.core.grid.grid_manager import GridManager
@@ -21,15 +18,14 @@ from src.core.maze import Maze
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
 from src.game_objects.player import Player
-from src.game_objects.wall import Wall
 from src.rendering.camera import Camera
-from src.utils.hyper_parameters import MAZE_SIZE, CELL_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, CELL_HEIGHT, PLAYER_WIDTH, \
+from src.utils.constants import MAZE_SIZE, CELL_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, CELL_HEIGHT, PLAYER_WIDTH, \
     ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED
 
 
 class TrainGame(Game):
     def __init__(self, player_model: DQNWrapper, enemy_model: DQNWrapper, config: DQNConfig):
-        super().__init__()
+        super().__init__(enemy_model)
         objects_to_add = list[GameObject]()
         self.game_objects = list[GameObject]()
         self.collision_system = CollisionSystem()
@@ -49,6 +45,7 @@ class TrainGame(Game):
         self.players = list[Player]()
         self.players.append(Player(empty_cells[0][0] * CELL_WIDTH, empty_cells[0][1] * CELL_HEIGHT,
                                    PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
+
 
         for player in self.players:
             objects_to_add.append(player)
@@ -98,7 +95,7 @@ class TrainGame(Game):
         return self.enemies[0]
 
     def get_rewards(self) -> tuple:
-        rewards = self.reward_tracker.calculate_rewards(self.get_player(), self.get_enemy(), self.events)
+        rewards = self.reward_tracker.calculate_rewards(self.get_player(), self.get_enemy(), self.events, self.state_encoder)
         if self.is_running:
             self.sum_rewards[0] += rewards[0]
             self.sum_rewards[1] += rewards[1]

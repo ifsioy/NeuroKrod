@@ -7,7 +7,7 @@ from src.ai.utils.config import DQNConfig
 from src.ai.utils.logs import Logs
 from src.core.games.train_game import TrainGame
 from src.rendering.drawer import Drawer
-from src.utils.hyper_parameters import GAME_DURATION, SCREEN_WIDTH, SCREEN_HEIGHT, TRAINING_FPS
+from src.utils.constants import GAME_DURATION, SCREEN_WIDTH, SCREEN_HEIGHT, TRAINING_FPS
 
 
 class GameManager:
@@ -43,8 +43,6 @@ class GameManager:
             player_states.append(states[0])
             enemy_states.append(states[1])
 
-        # actions =
-
         for i in range(self.num_games):
             self.games[i].step(self.dt)
             new_states = self.games[i].get_state()
@@ -67,6 +65,11 @@ class GameManager:
             else:
                 player_dones.append(False)
                 enemy_dones.append(False)
+
+            # if i == 0:
+            #     print()
+            #     print('action:', actions[1])
+            #     print('reward:', rewards[1])
 
         return player_states, player_actions, player_new_states, player_rewards, player_dones, \
                enemy_states, enemy_actions, enemy_new_states, enemy_rewards, enemy_dones

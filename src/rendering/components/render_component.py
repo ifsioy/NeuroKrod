@@ -1,6 +1,6 @@
 import pygame
 
-from src.utils.hyper_parameters import W_SHIFT
+from src.utils.constants import W_SHIFT
 
 
 class RenderComponent:

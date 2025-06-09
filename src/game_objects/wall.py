@@ -1,10 +1,12 @@
 from src.game_objects.game_object import GameObject
-from src.rendering.components.shape_component import ShapeComponent
-from src.utils.hyper_parameters import COLOR_BLUE
+from src.rendering.components.animated_sprite_component import AnimatedSpriteComponent
+from src.utils.animations import WALL_ANIMATION
 
 
 class Wall(GameObject):
     def __init__(self, x, y, width, height):
         super(Wall, self).__init__(x, y, width, height)
-        self.render_component = ShapeComponent(COLOR_BLUE)
+        self.render_component = AnimatedSpriteComponent({
+            'idle': WALL_ANIMATION,
+        }, 'idle')
 

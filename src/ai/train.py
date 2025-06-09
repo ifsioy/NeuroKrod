@@ -7,7 +7,7 @@ from src.ai.utils.config import DQNConfig
 from src.ai.utils.iter_counter import IterCounter
 from src.ai.utils.logs import Logs
 from src.core.game_manager import GameManager
-from src.utils.hyper_parameters import LOG_DRAW_PERIOD
+from src.utils.constants import LOG_DRAW_PERIOD
 
 
 def train(game_manager: GameManager, player_trainer: DQNTrainer, enemy_trainer: DQNTrainer, save_interval=10000, target_update_interval=DQNConfig.sync_target_frames):

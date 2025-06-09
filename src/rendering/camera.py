@@ -1,7 +1,7 @@
 import pygame
 
 from src.game_objects.game_object import GameObject
-from src.utils.hyper_parameters import H_SHIFT, W_SHIFT, BASE_SIZE, CAMERA_WIDTH, CAMERA_HEIGHT, CAMERA_SMOOTHNESS
+from src.utils.constants import H_SHIFT, W_SHIFT, BASE_SIZE, CAMERA_WIDTH, CAMERA_HEIGHT, CAMERA_SMOOTHNESS
 
 
 class Camera:

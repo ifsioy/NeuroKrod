@@ -2,7 +2,7 @@ import os
 import pygame
 
 from src.rendering.components.animation import AnimationData
-from src.utils.hyper_parameters import BASE_SIZE
+from src.utils.constants import BASE_SIZE
 
 
 class SpriteLoader:

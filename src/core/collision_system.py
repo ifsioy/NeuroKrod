@@ -10,7 +10,7 @@ from src.game_objects.key import Key
 from src.game_objects.movable import Movable
 from src.game_objects.player import Player
 from src.game_objects.wall import Wall
-from src.utils.hyper_parameters import KEYS_NUMBER, CAUGHT, WIN, HOLE_USED, KEY_COLLECTED
+from src.utils.constants import KEYS_NUMBER, CAUGHT, WIN, HOLE_USED, KEY_COLLECTED
 
 
 class CollisionSystem:
@@ -120,6 +120,9 @@ class CollisionSystem:
         player.key_collected()
         key.destroy()
         pygame.event.post(KEY_COLLECTED)
+
+        if player.keys_collected == KEYS_NUMBER:
+            self._collision_groups[Gates][0].opened = True
 
     def _handle_player_hole(self, player: Player, hole: Hole):
         if not hole in self._collision_groups[Hole]:

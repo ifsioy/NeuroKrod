@@ -1,6 +1,12 @@
+import os
 from datetime import datetime, timedelta
 import random
 
+from gameobjects_serializer import save_game_objects, load_game_objects
+
+from src.ai.models.dqn_model import DQNWrapper
+from src.ai.utils.config import DQNConfig
+from src.core.controllers.ai_controller import AIController
 from src.core.grid.grid_manager import GridManager
 from src.core.collision_system import CollisionSystem
 from src.core.controllers.base_controller import BaseController
@@ -11,14 +17,16 @@ from src.core.event_system import EventSystem, EventType
 from src.core.games.base_game import BaseGame
 from src.game_objects.enemy import Enemy
 from src.game_objects.game_object import GameObject
-from src.utils.hyper_parameters import *
+from src.game_objects.key import Key
+from src.rendering.drawer import Drawer
+from src.utils.constants import *
 
 from src.core.maze import Maze
 from src.rendering.camera import Camera
 from src.game_objects.player import Player
 
 class Game(BaseGame):
-    def __init__(self):
+    def __init__(self, enemy_model: DQNWrapper):
         super().__init__()
         objects_to_add = list[GameObject]()
         self.game_objects = list[GameObject]()
@@ -40,34 +48,36 @@ class Game(BaseGame):
         self.players.append(Player(empty_cells[0][0] * CELL_WIDTH, empty_cells[0][1] * CELL_HEIGHT,
                               PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED))
 
-        for player in self.players:
-            objects_to_add.append(player)
-            self.controllers.append(PlayerController(player))
 
         self.enemies = list[Enemy]()
         self.enemies.append(Enemy(empty_cells[-1][0] * CELL_WIDTH, empty_cells[-1][1] * CELL_HEIGHT,
                              ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_SPEED))
 
-        for enemy in self.enemies:
-            objects_to_add.append(enemy)
-            self.controllers.append(RandController(enemy))
 
         self.camera = Camera(self.players[0])
         self.drawer = None
 
         self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)
-        for obj in objects_to_add:
-            self.grid_manager.add(obj)
 
         self.event_system.subscribe(EventType.OBJECT_ADDED, self.grid_manager.on_object_added)
         self.event_system.subscribe(EventType.OBJECT_REMOVED, self.grid_manager.on_object_removed)
+
+        for player in self.players:
+            objects_to_add.append(player)
+            self.controllers.append(PlayerController(player))
+        for enemy in self.enemies:
+            objects_to_add.append(enemy)
+            config = DQNConfig()
+            self.controllers.append(AIController(enemy, self.grid_manager, enemy_model, config))
 
         for obj in objects_to_add:
             self.add_object(obj)
 
         self.events = []
 
+        self.enemy_model = enemy_model
         self.is_running = True
+        self.win = False
         self.start_time = datetime.now()
 
     def set_drawer(self, drawer):
@@ -168,3 +178,63 @@ class Game(BaseGame):
                 fps = 0
 
             # pygame.time.Clock().tick(15)
+
+        if os.path.exists(STATE_SAVE_DIR):
+            os.remove(STATE_SAVE_DIR)
+
+    def save(self, path = STATE_SAVE_DIR, fmt='json'):
+        save_game_objects(self.game_objects, path, fmt)
+
+    def load(self, path = STATE_SAVE_DIR, fmt='json'):
+        if not os.path.exists(path):
+            print('Save file doesnt exist')
+            return
+
+        objects_to_add = load_game_objects(path, fmt)
+
+        self.game_objects = list[GameObject]()
+        self.collision_system = CollisionSystem()
+        self.event_system = EventSystem()
+        self.event_system.subscribe(EventType.OBJECT_ADDED, self.collision_system.on_object_added)
+        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.collision_system.on_object_removed)
+
+        self.controllers = list[BaseController]()
+        self.controllers.append(GameController(self))
+
+        empty_cells = self.maze.find_empty_cells(objects_to_add)
+        random.shuffle(empty_cells)
+        self.players = list[Player]()
+        self.enemies = list[Enemy]()
+
+        keys_collected = KEYS_NUMBER
+
+        for obj in objects_to_add:
+            if type(obj) is Player:
+                self.players.append(obj)
+            elif type(obj) is Enemy:
+                self.enemies.append(obj)
+            elif type(obj) is Key:
+                keys_collected -= 1
+
+        self.camera = Camera(self.players[0])
+        self.set_drawer(Drawer(self.drawer.screen))
+
+        self.grid_manager = GridManager(MAZE_SIZE, MAZE_SIZE)
+
+        self.event_system.subscribe(EventType.OBJECT_ADDED, self.grid_manager.on_object_added)
+        self.event_system.subscribe(EventType.OBJECT_REMOVED, self.grid_manager.on_object_removed)
+
+        for player in self.players:
+            player.keys_collected = keys_collected
+            self.controllers.append(PlayerController(player))
+        for enemy in self.enemies:
+            config = DQNConfig()
+            self.controllers.append(AIController(enemy, self.grid_manager, self.enemy_model, config))
+
+        for obj in objects_to_add:
+            self.add_object(obj)
+
+        self.events = []
+
+        self.is_running = True
+        self.win = False
