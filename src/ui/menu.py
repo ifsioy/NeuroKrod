@@ -79,11 +79,11 @@ class MenuScreen:
 
         button_actions = [
             ("Начать игру", "start_normal_game"),
-            ("Таблица", "show_leaderboard"),
             ("Управление", "show_controls"),
+            ("Таблица", "show_leaderboard"),
             ("Дебаг", "start_debug_game"),
             ("Тренировка", "start_ai_training"),
-            ("Выход", "exit_game")
+            ("Выход", "exit_game"),
         ]
 
         for i, (text, action) in enumerate(button_actions):

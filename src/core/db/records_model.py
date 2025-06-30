@@ -10,5 +10,8 @@ class RecordsModel:
     def load(self) -> list:
         return self.db.get_top()
 
+    def clear(self):
+        self.db.clear_collection()
+
     def cleanup(self):
         self.db.close()

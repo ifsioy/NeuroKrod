@@ -10,7 +10,6 @@ import torchvision.transforms as transforms
 
 from src.ai.utils.config import DQNConfig
 
-from tqdm import tqdm
 
 device = 'cuda'
 
